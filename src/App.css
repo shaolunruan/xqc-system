@@ -6,7 +6,7 @@ html, body{
 }
 
 *{
-  font-family: "Arial";
+  font-family: "Lucida Sans";
   /*background: #ffffff;*/
 }
 
@@ -22,21 +22,20 @@ html, body{
 
 .system-title{
   color: #d8d8d8;
-  font-size: 1.4em;
-  margin-left: 50px;
+  font-size: 1.9em;
+  margin-left: 30px;
   font-family: Bahnschrift SemiBold;
 }
 
 
 .paper-title{
   color: #8e8e8e;
-  font-size: 1.2em;
+  font-size: 1.7em;
   font-style: italic;
   float: right;
 }
 
 .component{
-  height: 100%; /*后期可以去掉，等元素足够撑开border*/
   border: solid 1px #c7cabb;
   border-radius: 10px;
   padding: 15px;
@@ -44,4 +43,20 @@ html, body{
 
 .view2_axisBottom{
   font-size: 0.8em;
+}
+
+.ant-layout-header{
+  padding: 0;
+}
+
+
+.control_panel{
+  width: 100%;
+  height: 88px;
+  margin-bottom: 20px;
+  padding: 30px;
+}
+
+.ant-form-item .ant-form-item-label >label{
+  font-size: 1.5em;
 }

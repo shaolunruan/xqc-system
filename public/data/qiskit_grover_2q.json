@@ -29,7 +29,7 @@
                             "post_gate": "h",
                             "post_gate_name": "Hadamard",
                             "act_on": 0,
-                            "children": ["block1_step0_state0", "block1_step0_state2", "block0_step0_temp"],
+                            "children": ["block1_step0_state0", "block1_step0_state2"],
                             "positive": true
                         },
                         "state1": {
@@ -91,20 +91,6 @@
                         }
                     },
                     "probability": 0.25
-                },
-                "statehub_temp": {
-                    "states":{
-                        "state0": {
-                            "token": "block0_step0_temp",
-                            "state": "xx",
-                            "post_gate": "temp",
-                            "post_gate_name": "temp",
-                            "act_on": 1,
-                            "children": [],
-                            "positive": true
-                        }
-                    },
-                    "probability": 0.75
                 }
             },
             "statevector": [[0.5,0],[0.5,0],[0.5,0],[0.5,0]]

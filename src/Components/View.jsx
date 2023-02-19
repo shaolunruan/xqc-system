@@ -3,18 +3,32 @@ import axios from 'axios'
 import * as d3 from 'd3'
 
 
-// import func_query_before from "../function/func_query_before";
+import {view1_colorScheme, view1_area_color, view1_stroke_color} from "../function/view1_colorScheme";
 
 
 function View(props){
 
 
+    const param_algo = props.param_algo || 'example'
+
+
     ///////////////////// 声明一些 State 和 Ref /////////////////////////
 
-    // 声明 State 和 Ref
-    let views_height = useRef({
-        'view1_height': 300,
-        'view2_height': 450
+
+    //定义是否mount的ref
+    const didMount = useRef(false)
+
+    // 数据存这儿
+    let data = useRef({})
+
+
+    let layout_attribute = useRef({
+        'view1_height': 120,
+        'view2_height': 450,
+        'margin_top': 30,
+        'margin_left': 30,
+        'padding_top': 20,
+        'padding_left': 30
     })
 
     let selectArr = useRef([])
@@ -30,28 +44,32 @@ function View(props){
     function draw_view1(data){
 
         // 定义布局变量
-        const view1_width = 1700, view1_height = views_height.current['view1_height']
-        const view1_margin_top = 30, view1_margin_left = 30
-        const view1_padding_top_bottom = 20, view1_padding_left_right = 30
+        const layout = layout_attribute.current
+        const view1_width = 1700, view1_height = layout['view1_height']
+        const view1_margin_top = layout['margin_top'], view1_margin_left = layout['margin_left']
+        const view1_padding_top_bottom = layout['padding_top'], view1_padding_left_right = layout['padding_left']
 
 
         // 定义元素的长和宽
         const content_width = view1_width - 2*view1_padding_left_right
+        const heading_height = 20, tag_gap = 7
+        const view1_label_width = 40, view1_label_height = 25
+        const gap_heading_area = 20
 
 
 
 
 
 
-
+        ////////////////// 开始构造View1的数据 //////////////
 
         let step_data = [] //每一个step的数据都放这里
 
-        Object.entries(data).map(d=>{
-            let [block_name, block_value] = d
+        Object.entries(data).map(d0=>{
+            let [block_name, block_value] = d0
 
-            Object.entries(block_value).forEach(_d=>{
-                let [step_name, step_value] = _d
+            Object.entries(block_value).forEach(_d0=>{
+                let [step_name, step_value] = _d0
 
                 let name = `${block_name}_${step_name}`
 
@@ -60,6 +78,30 @@ function View(props){
         })
 
 
+        let view1_data = step_data.map(d=>{
+
+            let gate = d['hubs']['statehub0']['states']['state0']['post_gate'] || 'unknown'
+
+            let state_pr_arr = {}
+            Object.values(d['hubs']).forEach(_d=>{
+                Object.values(_d['states']).forEach(__d=>{
+
+
+                    state_pr_arr[`s_${__d['state']}`] = {
+                        'state': __d['state'],
+                        'prob': _d['probability']
+                    }
+
+                })
+            })
+
+            return {
+                "block": d['block'],
+                "step": d['step_name'],
+                "gate": gate,
+                "states": state_pr_arr
+            }
+        })
 
 
 
@@ -75,40 +117,262 @@ function View(props){
 
         // 生成 每一个 step 的单位块， 叫做 block
         let block_width = content_width / (step_data.length)
+        let heading_width = block_width - tag_gap
 
-        // 画上方的 代表 step 和 gate 的 bars
 
-        let view1_data = step_data.map(d=>{
 
-            let gate = d['hubs']['statehub0']['states']['state0']['post_gate'] || 'unknown'
 
-            let state_pr_arr = []
-            Object.values(d['hubs']).forEach(_d=>{
-                Object.values(_d['states']).forEach(__d=>{
+        let heading_g = view1.append('g')
+            .attr('class', 'view1_heading')
+            .attr('transform', `translate(${view1_padding_left_right}, ${view1_padding_top_bottom})`)
+            .selectAll('.null')
+            .data(view1_data.reduce((arr, d)=>{
+                if (d['gate'] !== 'unknown'){
+                    arr.push(d)
+                    return arr
+                }
+                return arr
+            }, []))
+            .join('g')
+            .attr('class', d=>d['step'])
+            .attr('transform', (d,i)=>`translate(${i * block_width},${0})`)
 
-                    let obj = {
-                        'state': __d['state'],
-                        'prob': _d['probability']
-                    }
 
-                    state_pr_arr.push(obj)
-                })
+
+        // 画上方的 代表 step 和 gate 的 heading
+
+
+        heading_g
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', heading_width)
+            .attr('height', heading_height)
+            // .attr('rx', rx)
+            .attr('fill', (d,i)=>view1_colorScheme[(d['block'].match(/\d+$/)[0])%8])
+            // .attr('stroke', "#2f2f2f")
+            // .attr('stroke-width', '1px')
+
+
+        heading_g.append('text')
+            .html(d=>d['gate'])
+            .attr('transform', `translate(${heading_width/2.2}, ${heading_height/1.3})`)
+            .style('font-size', '1.2em')
+            // .style('font-weight', 'bold')
+            // .style('font-style', 'italic')
+            .style('fill', '#444444')
+
+
+
+        //////////// 画下面的 stacked area chart ////////////
+
+        // 构造 keys 数据
+        let keys = view1_data.reduce(function(arr, d){
+            Object.values(d['states']).forEach(_d=>{
+                if(!arr.includes(_d['state'])){
+                    arr.push(_d['state'])
+                }
+            })
+            return arr
+        }, [])
+
+
+        let values = view1_data.map(d=>{
+
+            let obj = {}
+
+            keys.forEach(_d=>{
+
+                obj[_d] = d['states'][`s_${_d}`]? d['states'][`s_${_d}`]['prob'] : 0
+
             })
 
-            return {
-                "block": d['block'],
-                "step": d['step_name'],
-                "gate": gate,
-                "states": state_pr_arr
+            obj['block'] = d['block']
+            obj['step'] = d['step']
+
+            return obj
+        })
+
+
+
+        let area_g = view1.append('g')
+            .attr('transform', `translate(${view1_padding_left_right}, ${view1_padding_top_bottom+heading_height+gap_heading_area})`)
+            .attr('class', 'area_chart')
+
+
+        let view1_x = d3.scaleLinear()
+            .domain([0, view1_data.length])
+            .range([0, content_width])
+
+        let view1_y = d3.scaleLinear()
+            .domain([0, 1])
+            .range([0, view1_height])
+
+
+        let view1_state_colorScale = d3.scaleOrdinal()
+            .domain(keys)
+            .range(view1_stroke_color)
+
+        let view1_state_areaColorScale = d3.scaleOrdinal()
+            .domain(keys)
+            .range(view1_area_color)
+
+
+
+        // 用values构造d3.stack数据
+        let stacked_data = d3.stack().keys(keys)(values)
+
+
+
+        area_g.selectAll('.null')
+            .data(stacked_data)
+            .join('path')
+            .style('fill', (d,i)=>view1_state_areaColorScale(d['key']))
+            .attr('d', d3.area()
+                .curve(d3.curveBumpX)
+                .x(function(d,i) { return view1_x(i); })
+                .y0(function(d) { return view1_y(d[0]); })
+                .y1(function(d) { return view1_y(d[1]); }))
+
+
+
+
+        // 画每个step之间的竖线
+
+
+        let temp = area_g.selectAll('.null')
+            .data(stacked_data)
+            .join('g')
+            .attr('class', d=>`${d['key']}`)
+            .attr('id', d=>`colorIndex-${d['key']}`)
+            .selectAll('.null')
+                .data(d=>d)
+                .join('line')
+                .attr('x1', (d,i)=>i*block_width)
+                .attr('y1', d=>view1_y(d[0]))
+                .attr('x2', (d,i)=>i*block_width)
+                .attr('y2', d=>view1_y(d[1]))
+                .style('stroke', function(x){
+                    return view1_state_colorScale(+d3.select(this).node().parentNode.getAttribute('id').split('-')[1])
+                })
+                .style('stroke-width', 3)
+
+
+
+
+
+        // 画area之间的空白的缝隙
+        let gap_data = stacked_data.map(d=>d.map(_d=>_d[1]))
+        gap_data.pop() // 去除最后一个元素，本来是最上面的那一条线 （e.g. [1,1,1,1,1,1,1,1,1,1,1,1]）
+
+
+        area_g.selectAll('.null')
+            .data(gap_data)
+            .join('path')
+            .attr("fill", "none")
+            .attr("stroke", "#ffffff")
+            .attr("stroke-width", 4)
+            .attr('d', d3.line()
+                .curve(d3.curveBumpX)
+                .x((d,i)=>view1_x(i))
+                .y((d,i)=>view1_y(d))
+            )
+
+
+
+
+
+        // 画新生的state的标识label
+        let view1_label_data = stacked_data.map(d=>{
+
+            let start_points = []
+            d.reduce((prev, cur, i)=>{
+
+                let diff_prev = prev[1] - prev[0]
+                let diff_cur = cur[1]  - cur[0]
+                let index = 0
+
+                // 主要针对起始的那种状态
+                if(i==1 && diff_prev==1){
+                    index = i-1
+                    start_points.push([0, 0, prev.data, index, d['key']])
+                }
+
+                if(diff_prev==0 && diff_cur>0){
+                    index = i-1
+                    start_points.push([...prev, prev.data, index, d['key']])
+                }
+
+                return cur
+            })
+
+            return start_points
+        })
+
+
+
+        let temp_obj = {}
+        view1_label_data.flat().forEach(d=>{
+
+            let name = `s${`${d[1]}`.replace(/[,.-]/g, '')}-${`${d[3]}`.replace(/[,.-]/g, '')}`
+
+            if(Object.keys(temp_obj).includes(name)){
+                temp_obj[name].push(d)
+            }else{
+                temp_obj[name] = [d]
             }
         })
 
-        // console.log(step_data)
 
-        console.log(view1_data)
 
-        view1.append('g')
-            // .
+        let area_label = area_g.append('g')
+            .attr('class', `view1_label`)
+            .selectAll('.null')
+            .data(Object.values(temp_obj))
+            .join('g')
+            .attr('transform', (d,i)=>`translate(${view1_x(d[0][3])}, ${view1_y(d[0][1])})`)
+
+
+
+        let area_label_g = area_label
+            .selectAll('.null')
+            .data(d=>d)
+            .join('g')
+            .attr('transform', (d,i)=>(`translate(${-view1_label_width/2},${(i-1)*view1_label_height})`))
+
+
+
+        area_label_g
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', view1_label_width)
+            .attr('height', view1_label_height)
+            .attr('fill', '#ffffff')
+            .attr('stroke', d=>view1_state_colorScale(d[4]))
+            .attr('stroke-width',3)
+            .attr('rx', 4)
+
+
+
+        area_label_g.append('text')
+            .html(d=>`|${ d[4]}&#x27E9`)
+            .attr('transform', `translate(${view1_label_width/5}, ${view1_label_height/1.4})`)
+            .style('font-size', '1.1em')
+            .style('fill', d=>view1_state_colorScale(d[4]))
+            .style('font-weight', 'bold')
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -124,9 +388,10 @@ function View(props){
 
 
         // 定义 布局 变量
-        const view2_width = 1700, view2_height = views_height.current['view2_height']
-        const view2_margin_top = 30, view2_margin_left = 30
-        const view2_padding_top_bottom = 20, view2_padding_left_right = 30
+        const layout = layout_attribute.current
+        const view2_width = 1700, view2_height = layout['view2_height']
+        const view2_margin_top = layout['margin_top']+100, view2_margin_left = layout['margin_left']
+        const view2_padding_top_bottom = layout['padding_top'], view2_padding_left_right = layout['padding_left']
 
 
         const content_width = view2_width - 2*view2_padding_left_right
@@ -155,7 +420,7 @@ function View(props){
         let view2 = d3.select('.svg')
             .append('g')
             .attr('class', 'view2')
-            .attr('transform', `translate(${view2_margin_top}, ${views_height.current['view1_height']+view2_margin_left})`)
+            .attr('transform', `translate(${view2_margin_left}, ${layout_attribute.current['view1_height']+view2_margin_top})`)
 
 
 
@@ -220,6 +485,9 @@ function View(props){
                 .tickValues([0, 25, 50, 75, 100])
                 .tickFormat(d=>`${d}%`)
             )
+
+
+
 
 
 
@@ -624,7 +892,10 @@ function View(props){
         axios.get(`data/qiskit_grover_2q.json`)
         // axios.get(`data/temp.json`)
             .then(res=>{
-                render_view(res.data)
+
+                data.current = res.data
+
+                render_view(data.current)
             })
 
     }
@@ -641,7 +912,7 @@ function View(props){
     //画图函数
     function render_view(data){
 
-        const svg_width = 1800, svg_height = 1500
+        const svg_width = 1800, svg_height = 1300
 
 
         // 绘制 画布
@@ -655,10 +926,13 @@ function View(props){
         // 绘制 view1
         draw_view1(data)
 
+
         // 绘制 view2
         draw_view2(data)
 
     }
+
+
 
 
 
@@ -674,6 +948,27 @@ function View(props){
         render_from_data()
 
     }, [])
+
+
+
+    // 当 algo 更新的时候update
+    useEffect(()=>{
+
+
+        // 跳过第一次 mount
+        if(!didMount.current){
+            didMount.current = true
+
+            return
+        }
+
+
+        // 绘制 view2
+        console.log(123)
+
+
+
+    }, [param_algo])
 
 
 
