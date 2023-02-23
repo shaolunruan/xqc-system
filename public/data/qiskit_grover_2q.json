@@ -58,7 +58,7 @@
                             "state": "00",
                             "post_gate": "cz",
                             "post_gate_name": "Control Z",
-                            "act_on": 0,
+                            "act_on": 1,
                             "children": ["block2_step0_state0"],
                             "positive": true
                         },
@@ -67,7 +67,7 @@
                             "state": "01",
                             "post_gate": "cz",
                             "post_gate_name": "Control Z",
-                            "act_on": 0,
+                            "act_on": 1,
                             "children": ["block2_step0_state1"],
                             "positive": true
                         },
@@ -76,7 +76,7 @@
                             "state": "10",
                             "post_gate": "cz",
                             "post_gate_name": "Control Z",
-                            "act_on": 0,
+                            "act_on": 1,
                             "children": ["block2_step0_state2"],
                             "positive": true
                         },
@@ -85,7 +85,7 @@
                             "state": "11",
                             "post_gate": "cz",
                             "post_gate_name": "Control Z",
-                            "act_on": 0,
+                            "act_on": 1,
                             "children": ["block2_step0_state3"],
                             "positive": true
                         }

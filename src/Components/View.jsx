@@ -25,10 +25,14 @@ function View(props){
     let layout_attribute = useRef({
         'view1_height': 120,
         'view2_height': 450,
-        'margin_top': 30,
+        'margin_top': 20,
         'margin_left': 30,
         'padding_top': 20,
-        'padding_left': 30
+        'padding_left': 30,
+
+        'gap_view1_view2': 45,
+
+        'view_title_height': 35
     })
 
     let selectArr = useRef([])
@@ -48,13 +52,15 @@ function View(props){
         const view1_width = 1700, view1_height = layout['view1_height']
         const view1_margin_top = layout['margin_top'], view1_margin_left = layout['margin_left']
         const view1_padding_top_bottom = layout['padding_top'], view1_padding_left_right = layout['padding_left']
+        const view1_title_width = 150, view1_title_height = layout['view_title_height']
+
 
 
         // 定义元素的长和宽
         const content_width = view1_width - 2*view1_padding_left_right
         const heading_height = 20, tag_gap = 7
         const view1_label_width = 40, view1_label_height = 25
-        const gap_heading_area = 20
+        const gap_heading_area = 10
 
 
 
@@ -107,7 +113,7 @@ function View(props){
 
 
 
-        // 创建 view2 的selection
+        // 创建 view1 的selection
         let view1 = d3.select('.svg')
             .append('g')
             .attr('class', 'view1')
@@ -122,10 +128,69 @@ function View(props){
 
 
 
+
+        // 画View1的上方的坐标轴
+
+        let axis_bottom_count = 0
+
+        let temp_arr = Object.values(data)
+        temp_arr.pop()// 去除最后一个元素，因为没有对应的gate
+
+        let steps_arr = temp_arr.reduce((arr, cur)=>{
+            let temp_arr = []
+
+            Object.keys(cur).forEach(d=>{
+                temp_arr.push(axis_bottom_count)
+                axis_bottom_count = axis_bottom_count+1
+            })
+
+            let position = 0
+            if(temp_arr.length==0){
+                position = temp_arr[0]
+            }else{
+                position = (d3.extent(temp_arr)[1]+1 + d3.extent(temp_arr)[0])/2
+            }
+
+            arr.push(position)
+
+            return arr
+        },[])
+
+
+
+
+
+
+        // heading是每个方块的个体
         let heading_g = view1.append('g')
             .attr('class', 'view1_heading')
-            .attr('transform', `translate(${view1_padding_left_right}, ${view1_padding_top_bottom})`)
-            .selectAll('.null')
+            .attr('transform', `translate(${view1_padding_left_right}, ${view1_title_height+view1_padding_top_bottom})`)
+
+
+
+
+        // 画 view1 的axis
+        let scaleX = d3.scaleLinear()
+            .domain([0, axis_bottom_count])
+            .range([0, content_width-block_width]) /*TODO: 这里不知道为什么加了-block_width就work了，可能以后会出bug*/
+
+
+
+
+        heading_g.append('g')
+            .attr('class', 'view1_axisBottom')
+            .attr('transform', `translate(${0}, ${-10})`)
+            .call(d3.axisTop(scaleX)
+                .tickValues(steps_arr)
+                .tickFormat((_, i)=>`Block ${i+1}`)
+            )
+
+
+
+
+
+
+        let rects = heading_g.selectAll('.null')
             .data(view1_data.reduce((arr, d)=>{
                 if (d['gate'] !== 'unknown'){
                     arr.push(d)
@@ -142,7 +207,7 @@ function View(props){
         // 画上方的 代表 step 和 gate 的 heading
 
 
-        heading_g
+        rects
             .append('rect')
             .attr('x', 0)
             .attr('y', 0)
@@ -154,7 +219,9 @@ function View(props){
             // .attr('stroke-width', '1px')
 
 
-        heading_g.append('text')
+
+
+        rects.append('text')
             .html(d=>d['gate'])
             .attr('transform', `translate(${heading_width/2.2}, ${heading_height/1.3})`)
             .style('font-size', '1.2em')
@@ -175,6 +242,8 @@ function View(props){
             })
             return arr
         }, [])
+            .sort()
+
 
 
         let values = view1_data.map(d=>{
@@ -196,7 +265,7 @@ function View(props){
 
 
         let area_g = view1.append('g')
-            .attr('transform', `translate(${view1_padding_left_right}, ${view1_padding_top_bottom+heading_height+gap_heading_area})`)
+            .attr('transform', `translate(${view1_padding_left_right}, ${view1_title_height+view1_padding_top_bottom+heading_height+gap_heading_area})`)
             .attr('class', 'area_chart')
 
 
@@ -365,13 +434,37 @@ function View(props){
 
 
 
+        // 画这个View的 title
+        let view_title = view1.append('g')
+            .attr('class', 'view_title')
+            .attr('transform', `translate(${view1_margin_left+20}, ${view1_margin_top})`)
 
 
+        view_title
+            .append('text')
+            .html(`View Name`)
+            .attr('transform', `translate(${40}, ${0})`)
+            .attr('class', 'view_title_text')
 
 
+        // icon
+        view_title
+            .append('text')
+            .attr('transform', `translate(${0}, ${0})`)
+            .attr("class", "fas view_title_icon")
+            .text('\uf1fe');
 
 
-
+        // border
+        view_title.append('rect')
+            .attr('x', -9)
+            .attr('y', -33)
+            .attr('width', 224)
+            .attr('height', 44)
+            // .attr('rx', 5)
+            .attr('fill', 'none')
+            .attr('stroke', "#2f2f2f")
+            .attr('stroke-width', '2px')
 
 
 
@@ -389,13 +482,16 @@ function View(props){
 
         // 定义 布局 变量
         const layout = layout_attribute.current
-        const view2_width = 1700, view2_height = layout['view2_height']
-        const view2_margin_top = layout['margin_top']+100, view2_margin_left = layout['margin_left']
+        const view2_width = 1550, view2_height = layout['view2_height']
+        const view2_margin_top = 3*layout['margin_top']+layout['view1_height']+layout['view_title_height']+2*layout['padding_top'], view2_margin_left = layout['margin_left']
         const view2_padding_top_bottom = layout['padding_top'], view2_padding_left_right = layout['padding_left']
+        const view_title_height = layout['view_title_height']
+        const gap_view1_view2 = layout['gap_view1_view2']
+
 
 
         const content_width = view2_width - 2*view2_padding_left_right
-        const bottomAxis_top = view2_height - view2_padding_top_bottom
+        const bottomAxis_top = view2_height - 2*view2_padding_top_bottom
 
 
 
@@ -420,9 +516,12 @@ function View(props){
         let view2 = d3.select('.svg')
             .append('g')
             .attr('class', 'view2')
-            .attr('transform', `translate(${view2_margin_left}, ${layout_attribute.current['view1_height']+view2_margin_top})`)
+            .attr('transform', `translate(${view2_margin_left}, ${gap_view1_view2+view2_margin_top})`)
 
 
+
+        let chart_g = view2.append('g')
+            .attr('transform', `translate(${view2_padding_left_right+20}, ${view2_padding_top_bottom+view_title_height+20})`)
 
 
 
@@ -460,10 +559,10 @@ function View(props){
             .range([0, view2_width - 2*view2_padding_left_right])
 
 
-        view2.append('g')
+        chart_g.append('g')
             .attr('class', 'view2_axisBottom')
-            .attr('transform', `translate(${view2_padding_left_right}, ${bottomAxis_top})`)
-            .call(d3.axisBottom(scaleX)
+            .attr('transform', `translate(${0}, ${-20})`)
+            .call(d3.axisTop(scaleX)
                 .tickValues(steps_arr)
                 .tickFormat((_, i)=>`Block ${i+1}`)
             )
@@ -478,9 +577,9 @@ function View(props){
             .domain([100, 0])
             .range([0, view2_height - 2*view2_padding_top_bottom])
 
-        view2.append('g')
+        chart_g.append('g')
             .attr('class', 'view2_axisLeft')
-            .attr('transform', `translate(${view2_padding_left_right-15}, ${view2_padding_top_bottom})`)
+            .attr('transform', `translate(${-15}, ${0})`)
             .call(d3.axisLeft(scaleY)
                 .tickValues([0, 25, 50, 75, 100])
                 .tickFormat(d=>`${d}%`)
@@ -522,8 +621,8 @@ function View(props){
 
 
         // 画block的灰白相间的背景
-        view2.append('g')
-            .attr('transform', `translate(${view2_padding_left_right}, ${view2_padding_top_bottom})`)
+        chart_g.append('g')
+            // .attr('transform', `translate(${view2_padding_left_right}, ${view2_padding_top_bottom})`)
             .selectAll('.null')
             .data(step_data)
             .join('rect')
@@ -538,13 +637,13 @@ function View(props){
 
 
 
-        let block = view2.selectAll('.step')
+        let block = chart_g.selectAll('.step')
             .data(step_data)
             .join('g')
             .attr('class', d=>d['block'])
             .attr('transform', (d, i)=>{
-                let y = view2_padding_top_bottom
-                let x = view2_padding_left_right + i*block_width
+                let y = 0
+                let x = 0 + i*block_width
 
                 return `translate(${x}, ${y})`
             })
@@ -712,11 +811,12 @@ function View(props){
 
 
 
-
         // 画每个state后面跟的作用门
         let gate_g = state_g.append('g')
             .attr('transform', `translate(${state_width + gate_offset}, ${state_height/2})`)
             .attr('class', "gate_g")
+
+
 
 
         gate_g.append('circle')
@@ -728,6 +828,8 @@ function View(props){
             .style("fill", "#ffffff")
 
 
+
+
         gate_g.append('text')
             .html(d=>d['post_gate'])
             .attr('transform', `translate(${-gateCircle_radius/2}, ${gateCircle_radius/2.5})`)
@@ -735,6 +837,43 @@ function View(props){
             .style('font-weight', 'bold')
             .style('font-style', 'italic')
             .style('fill', '#636363')
+
+
+
+
+        // 画这个View的 title
+        let view_title = view2.append('g')
+            .attr('class', 'view_title')
+            .attr('transform', `translate(${view2_padding_left_right+10}, ${view2_padding_top_bottom})`)
+
+
+
+        view_title
+            .append('text')
+            .html(`View Name`)
+            .attr('transform', `translate(${45}, ${0})`)
+            .attr('class', 'view_title_text')
+
+
+        // icon
+        view_title
+            .append('text')
+            .attr('transform', `translate(${0}, ${0})`)
+            .attr("class", "fa view_title_icon")
+            .text('\uf542');
+
+
+
+        // border
+        view_title.append('rect')
+            .attr('x', -9)
+            .attr('y', -35)
+            .attr('width', 225)
+            .attr('height', 46)
+            // .attr('rx', 5)
+            .attr('fill', 'none')
+            .attr('stroke', "#2f2f2f")
+            .attr('stroke-width', '2px')
 
 
 
@@ -912,7 +1051,7 @@ function View(props){
     //画图函数
     function render_view(data){
 
-        const svg_width = 1800, svg_height = 1300
+        const svg_width = 1600, svg_height = 1100
 
 
         // 绘制 画布
@@ -964,7 +1103,7 @@ function View(props){
 
 
         // 绘制 view2
-        console.log(123)
+        console.log('View1 update')
 
 
 

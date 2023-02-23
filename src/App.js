@@ -8,9 +8,9 @@ import 'antd/dist/reset.css';
 import {SisternodeOutlined} from '@ant-design/icons';
 
 
-import Try from "./Components/try";
 import View from "./Components/View";
-
+import OriginCircuit from "./Components/OriginCircuit";
+import Dandelion from "./Components/Dandelion";
 
 
 
@@ -67,6 +67,8 @@ function App() {
     return (
 
         <ConfigProvider theme={{ hashed: false }}>
+
+
             <Layout style={{ height: "100%"}}>
                 <Content style={root_comp_style.contentStyle}>
                     <Header style={root_comp_style.headerStyle}>
@@ -77,14 +79,21 @@ function App() {
                         </div>
 
                     </Header>
-                    <Row gutter={16}  justify="center">
-                        <Col span={24}>
+
+                    {/* control panel*/}
+                    <Row  justify="center">
+                        <Col style={{width: '98%'}}>
                             <div className={'component control_panel'}>
 
                                 <Form size={'large'} layout={'inline'}>
+
+                                    <Form.Item style={{paddingLeft: '30px', marginRight: '30px'}}>
+                                        <i className="fas fa-pen view_title_icon" style={{fontSize: '1.5em'}}/>
+                                        <span className={'view_title_text'} style={{fontSize: '1.8em'}}> Control panel </span>
+                                    </Form.Item>
+
+
                                     <Space size={200}>
-
-
 
 
                                         <Form.Item label="Algo selection">
@@ -144,25 +153,49 @@ function App() {
                                     </Space>
                                 </Form>
 
-
-
-
-
                             </div>
                         </Col>
                     </Row>
-                    <Row gutter={16}  justify="center" style={{height: "82%"}}>
-                        <Col span={17}>
+
+
+                    {/* View 层*/}
+                    <Row  gutter={0} justify="space-around" style={{height: "82%"}}>
+
+
+                            <Col span={16}>
+
+                                <Row gutter={30}  justify="center" style={{height: "75%", marginBottom: '20px'}}>
+                                    <div className={'component'} style={{width: '95%', height: "100%"}}>
+
+                                        <View param_algo={param_algo}></View>
+
+                                    </div>
+                                </Row>
+
+
+                                <Row gutter={30}  justify="center" style={{height: "20%"}}>
+                                    <div className={'component'} style={{width: '95%', height: "100%"}}>
+
+                                        <OriginCircuit></OriginCircuit>
+
+                                    </div>
+                                </Row>
+
+                            </Col>
+
+
+
+
+
+
+
+
+
+
+                        <Col  className="gutter-row" span={8}>
                             <div className={'component'} style={{height: "100%"}}>
 
-                                <View param_algo={param_algo}></View>
-
-                            </div>
-                        </Col>
-                        <Col span={7}>
-                            <div className={'component'} style={{height: "100%"}}>
-
-                                {/*<input value={value} onChange={handleValueChange}/>*/}
+                                <Dandelion></Dandelion>
 
                             </div>
                         </Col>

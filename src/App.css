@@ -11,7 +11,9 @@ html, body{
 }
 
 .ant-layout{
-  background: #ffffff;
+  background: #EDF0F4;
+  /*background: #ffffff;*/
+
 }
 
 #app{
@@ -36,12 +38,17 @@ html, body{
 }
 
 .component{
-  border: solid 1px #c7cabb;
+  border: solid 1px #ffffff;
   border-radius: 10px;
   padding: 15px;
+  background: #ffffff;
 }
 
 .view2_axisBottom{
+  font-size: 0.8em;
+}
+
+.view4_axisBottom{
   font-size: 0.8em;
 }
 
@@ -59,4 +66,15 @@ html, body{
 
 .ant-form-item .ant-form-item-label >label{
   font-size: 1.5em;
+}
+
+.view_title_text{
+  font-size: 2em;
+  fill: #4b4b4b;
+  font-weight: bold;
+}
+
+.view_title_icon{
+  fill: #4b4b4b;
+  font-size: 2em;
 }
