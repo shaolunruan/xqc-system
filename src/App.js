@@ -8,9 +8,12 @@ import 'antd/dist/reset.css';
 import {SisternodeOutlined} from '@ant-design/icons';
 
 
+
+
 import View from "./Components/View";
 import OriginCircuit from "./Components/OriginCircuit";
 import Dandelion from "./Components/Dandelion";
+import Legend from "./Components/Legend";
 
 
 
@@ -48,6 +51,11 @@ function App() {
 
     // 控制 选择的算法
     const [param_algo, setAlgo] = useState('example')
+    const [statevector, setStatevector] = useState([])
+    const [theta, setTheta] = useState(1)
+    const [point_radius, setPoint_radius] = useState(8)
+
+
 
 
 
@@ -56,6 +64,20 @@ function App() {
         // setAlgo(event.target.value)
         setAlgo(event)
 
+    }
+
+
+    function change_statevector(item1, item2) {
+        setStatevector([item1, item2])
+    }
+
+
+    function change_theta(value){
+        setTheta(value)
+    }
+
+    function change_pointRadius(value){
+        setPoint_radius(value)
     }
 
 
@@ -74,8 +96,8 @@ function App() {
                     <Header style={root_comp_style.headerStyle}>
                         <div style={{width: "100%"}}>
                             <SisternodeOutlined  style={{fontSize: '2.5em'}}/>
-                            <span className="system-title">XQC-System</span>
-                            <span className="paper-title">The tile of this paper / Die Fliese dieses Papiers</span>
+                            <span className="system-title">QuantumEyes</span>
+                            <span className="paper-title">QuantumEyes: Towards a Better Interpretability of Quantum Circuits</span>
                         </div>
 
                     </Header>
@@ -102,46 +124,82 @@ function App() {
                                                     onChange={handleValueChange}
                                             >
                                                 <Option value="example">example</Option>
-                                                <Option value="usa">example2</Option>
+                                                <Option value="example2">example2</Option>
                                             </Select>
                                         </Form.Item>
 
 
 
-                                        <Form.Item label="Form Layout"  >
-                                            <Radio.Group>
-                                                <Radio.Button value="horizontal">Horizontal</Radio.Button>
-                                                <Radio.Button value="vertical">Vertical</Radio.Button>
-                                                <Radio.Button value="inline">Inline</Radio.Button>
-                                            </Radio.Group>
-                                        </Form.Item>
+                                        {/*<Form.Item label="Form Layout"  >*/}
+                                        {/*    <Radio.Group>*/}
+                                        {/*        <Radio.Button value="horizontal">Horizontal</Radio.Button>*/}
+                                        {/*        <Radio.Button value="vertical">Vertical</Radio.Button>*/}
+                                        {/*        <Radio.Button value="inline">Inline</Radio.Button>*/}
+                                        {/*    </Radio.Group>*/}
+                                        {/*</Form.Item>*/}
 
 
-                                        <Form.Item label="Circle radius:" style={{width: '300px'}}>
+                                        <Form.Item label="Circle radius:" style={{width: '320px'}}>
                                             <Row>
 
 
-                                                <Col span={21}>
+                                                <Col>
                                                     <Slider
-                                                        range
                                                         step={0.01}
                                                         min={0}
-                                                        max={20}
-
-                                                        // defaultValue={[0, 0]}
+                                                        max={1}
+                                                        style={{width: '100px'}}
+                                                        defaultValue={1}
                                                         // min={this.state.view2_qual_extent[0]}
                                                         // max={this.state.view2_qual_extent[1]}
-                                                        // onAfterChange={this.view2_gate_qual_filter}
+                                                        // onAfterChange={setTheta}
+                                                        onChange={change_theta}
                                                         // disabled={check1()}
                                                     />
                                                 </Col>
-                                                <Col span={3}>
+                                                &nbsp;&nbsp;&nbsp;
+                                                <Col>
                                                     <InputNumber
                                                         /*min={1}
                                                         max={20}*/
-                                                        // value={this.state.view2_gate_qual_filter[1]}
-                                                        // controls={false}
-                                                        // style={{width: '80%'}}
+                                                        value={theta}
+                                                        controls={false}                                                        onChange={change_theta}
+                                                        onChange={change_theta}
+                                                        style={{width: '50px'}}
+                                                    />
+                                                </Col>
+
+                                            </Row>
+
+                                        </Form.Item>
+
+                                        <Form.Item label="Point radius:" style={{width: '320px'}}>
+                                            <Row>
+
+
+                                                <Col>
+                                                    <Slider
+                                                        step={0.5}
+                                                        min={0}
+                                                        max={8}
+                                                        style={{width: '100px'}}
+                                                        defaultValue={8}
+                                                        // min={this.state.view2_qual_extent[0]}
+                                                        // max={this.state.view2_qual_extent[1]}
+                                                        // onAfterChange={setTheta}
+                                                        onChange={change_pointRadius}
+                                                        // disabled={check1()}
+                                                    />
+                                                </Col>
+                                                &nbsp;&nbsp;&nbsp;
+                                                <Col>
+                                                    <InputNumber
+                                                        /*min={1}
+                                                        max={20}*/
+                                                        value={point_radius}
+                                                        controls={false}                                                        onChange={change_theta}
+                                                        onChange={change_pointRadius}
+                                                        style={{width: '50px'}}
                                                     />
                                                 </Col>
 
@@ -151,6 +209,8 @@ function App() {
 
 
                                     </Space>
+
+
                                 </Form>
 
                             </div>
@@ -167,7 +227,10 @@ function App() {
                                 <Row gutter={30}  justify="center" style={{height: "75%", marginBottom: '20px'}}>
                                     <div className={'component'} style={{width: '95%', height: "100%"}}>
 
-                                        <View param_algo={param_algo}></View>
+                                        <View
+                                            param_algo={param_algo}
+                                            change_statevector={change_statevector}
+                                        ></View>
 
                                     </div>
                                 </Row>
@@ -186,16 +249,14 @@ function App() {
 
 
 
-
-
-
-
-
-
                         <Col  className="gutter-row" span={8}>
-                            <div className={'component'} style={{height: "100%"}}>
+                            <div className={'component dandelion_div'} style={{height: "100%"}}>
 
-                                <Dandelion></Dandelion>
+                                <Dandelion
+                                    statevector={statevector}
+                                    theta={theta}
+                                    point_radius={point_radius}
+                                ></Dandelion>
 
                             </div>
                         </Col>
@@ -203,6 +264,12 @@ function App() {
 
                 </Content>
             </Layout>
+
+
+
+
+            {/*    把 Legend 放这里*/}
+            <Legend></Legend>
 
 
         </ConfigProvider>

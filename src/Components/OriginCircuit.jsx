@@ -21,8 +21,8 @@ function OriginCircuit(){
     function draw_originalCircuit(data){
 
 
-        const svg_width = 1600, svg_height = 255
-        const view4_margin_top = 15, view4_margin_bottom = 50, view4_margin_left = 10
+        const svg_width = 1600, svg_height = 235
+        const view4_margin_top = 15, view4_margin_bottom = 70, view4_margin_left = 10
         const view4_padding_top = 10, view4_padding_left_right = 30
         const view4_padding_bottom = 20
         const view4_title_height = 40
@@ -268,41 +268,41 @@ function OriginCircuit(){
 
 
         ///////////// 画 View 4 的title //////////////
-
-        // title 的 g
-        let title_g = view4.append('g')
-            .attr('transform', `translate(${view4_padding_left_right}, ${view4_padding_top})`)
-
-
-        title_g
-            .append('text')
-            .html(`View Name`)
-            .attr('transform', `translate(${45}, ${0})`)
-            .attr('class', 'view_title_text')
-            .style('font-size', `2em`)
-
-
-
-        // icon
-        title_g
-            .append('text')
-            .attr('transform', `translate(${0}, ${0})`)
-            .attr("class", "fa view_title_icon")
-            .style('font-size', `1.8em`)
-            .text('\uf542')
-
-        // border
-
-        title_g.append('rect')
-            .attr('x', -11)
-            .attr('y', -35)
-            .attr('width', 224)
-            .attr('height', view4_title_height)
-            // .attr('rx', 5)
-            .attr('fill', 'none')
-            .attr('stroke', "#2f2f2f")
-            .attr('stroke-width', '2px')
-
+        //
+        // // title 的 g
+        // let title_g = view4.append('g')
+        //     .attr('transform', `translate(${view4_padding_left_right}, ${view4_padding_top})`)
+        //
+        //
+        // title_g
+        //     .append('text')
+        //     .html(`View Name`)
+        //     .attr('transform', `translate(${45}, ${0})`)
+        //     .attr('class', 'view_title_text')
+        //     .style('font-size', `2em`)
+        //
+        //
+        //
+        // // icon
+        // title_g
+        //     .append('text')
+        //     .attr('transform', `translate(${0}, ${0})`)
+        //     .attr("class", "fa view_title_icon")
+        //     .style('font-size', `1.8em`)
+        //     .text('\uf542')
+        //
+        // // border
+        //
+        // title_g.append('rect')
+        //     .attr('x', -11)
+        //     .attr('y', -35)
+        //     .attr('width', 224)
+        //     .attr('height', view4_title_height)
+        //     // .attr('rx', 5)
+        //     .attr('fill', 'none')
+        //     .attr('stroke', "#2f2f2f")
+        //     .attr('stroke-width', '2px')
+        //
 
 
 

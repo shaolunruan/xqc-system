@@ -4,28 +4,34 @@ import dandelion_chart from "../function/dandelion_chart";
 import * as d3 from 'd3'
 
 
+import {colorMap_circle_fill, colorMap_circle_border, colorMap_point} from "../function/view1_colorScheme";
+import {state_color_point, state_color_fill, state_color_border} from "../function/color_scheme";
 
-function Dandelion(){
 
+function Dandelion(props){
+
+
+
+    const statevector = props.statevector || 'example'
+    const theta = props.theta || 1
+    const setPoint_radius = props.point_radius || 8
 
 
     //定义是否mount的ref
-    const didMount = useRef(false)
+    const didMount1 = useRef(false)
+    const didMount2 = useRef(false)
+    const didMount3 = useRef(false)
+    const states = useRef([])
+    const svg = useRef()
 
     // 数据存这儿
     let data = useRef({})
 
 
 
-    // 画 OriginCircuit 的函数
-    function draw_dandelionChart(data){
 
 
-
-        /////////////// 定义一些变量 ///////////////
-
-        const svg_width = 800, svg_height = 1000
-
+    function add_dandelion(statevector){
 
         // 四个prob：0.2， 0.25， 0.05， 0.5
         // let state_vector = [
@@ -45,8 +51,38 @@ function Dandelion(){
         // ]
 
 
+        // let state_vectors = [
+        //     [
+        //         [0.13, 0.428],
+        //         [0.07, -0.495],
+        //         [0.1, 0.2],
+        //         [0.4, 0.3]
+        //     ],
+        //     [
+        //         [0.13, 0.428],
+        //         [0.07, -0.495],
+        //         [0.1, 0.2],
+        //         [0.4, 0.3]
+        //     ]
+        // ]
+
+
+
+
         // 四个prob：0.2， 0.25， 0.05， 0.5
-        let state_vector = [
+        let state_vector_1 =
+            statevector[0] ||
+            [
+            [0.13, 0.428],
+            [0.07, -0.495],
+            [0.1, 0.2],
+            [0.4, 0.3]
+        ]
+
+
+        let state_vector_2 =
+            statevector[1] ||
+            [
             [0.13, 0.428],
             [0.07, -0.495],
             [0.1, 0.2],
@@ -57,63 +93,105 @@ function Dandelion(){
 
 
 
+        /////////////// 定义一些变量 ///////////////
+        const dandelion_width = 315, dandelion_height = 315
+        const dandelion_gap = 70
+        const bundle_width = dandelion_width*2 + dandelion_gap
+        const bundle_height = dandelion_width
+        const view_margin_left = 30, view_margin_top = 30
 
-        // 统计所有出现的states，e.g., ['00', '01', '10', '11']
-        let states = Object.values(data).reduce((arr, d)=>{
+        const link_label_bg_size = 30
+        const padding = 20
 
-            Object.values(d).forEach(d0=>{
 
-                Object.values(d0['hubs']).forEach(_d=>{
-                    Object.values(_d['states']).forEach(__d=>{
-                        if(!arr.includes(__d['state'])){
-                            arr.push(__d['state'])
-                        }
-                    })
-                })
+        let num = d3.selectAll('.bundle_container').size()
+
+
+
+
+
+        // 根据已经有的bundle来调整整个svg的大小
+        if(!svg.current){
+            return
+        }
+        svg.current.attr('height', (num+1)*(bundle_height+dandelion_gap))
+
+
+        let bundle_g = svg.current
+            .append('g')
+            .attr('class', function(){
+                return `bundle_container bundle_container_index_${d3.selectAll('.bundle_container').size()}`
             })
-
-            return arr
-
-        }, [])
-            .sort()// 按 ['00', '01', '10', '11'] 这样的顺序排序
+            .attr('transform', `translate(${view_margin_left},${view_margin_top + num*(bundle_height+dandelion_gap)})`)
 
 
+        // 加一个bundle的白色背景
+        bundle_g.append('rect')
+            .attr('x', -padding)
+            .attr('y', -padding)
+            .attr('width', bundle_width+ 2*padding)
+            .attr('height', bundle_height+ 2*padding)
+            .attr('rx', 15)
+            .attr('fill', '#ffffff')
+            // .attr('stroke', "#2f2f2f")
+            // .attr('stroke-width', '2px')
 
 
-
-        // 创建 svg 画布
-        let svg = d3.select('#dandelion_container')
-            .append('svg')
-            .attr('width', svg_width)
-            .attr('height', svg_height)
-            .attr('class', 'view_svg')
-
-
-
-
-
-        // 在这里调用 dandelion_chart 函数
-        dandelion_chart(state_vector, states, svg, [350, 350], [0,0], 0.1)
+        /////////////////////// 在这里调用 dandelion_chart 函数 /////////////////////
+        dandelion_chart(state_vector_1, states.current, bundle_g, [dandelion_width, dandelion_width], [0,0], theta)
+        dandelion_chart(state_vector_2, states.current, bundle_g, [dandelion_width, dandelion_width], [dandelion_width+dandelion_gap,0], theta)
 
 
 
-    }
+        let link_g = bundle_g.append('g')
+            .attr('transform', `translate(${dandelion_width},${dandelion_height/2})`)
 
 
+        // 连接两个dandelion chart的连线
+        // let link = link_g.append('line')
+        //     .attr('class', 'bundle_link ')
+        //     .attr('id', 'path_animation')
+        //     .attr('x1', 0)
+        //     .attr('y1', 0)
+        //     .attr('x2', dandelion_gap)
+        //     .attr('y2', 0)
+        //     .style('stroke', '#3c74f3')
+        //     .style('stroke-width', 5)
+        //     .attr('stroke-dasharray', `8 3`)
 
-    //请求数据函数，基于请求到的数据 调用 render_view 画图
-    function render_from_data(){
-
-        axios.get(`data/qiskit_grover_2q.json`)
-            // axios.get(`data/temp.json`)
-            .then(res=>{
-
-                data.current = res.data
+        let link = link_g.append('path')
+            .attr('id', 'path_animation_dandelion')
+            .attr('d', function(){
 
 
-                // 画 dandelion Chart
-                draw_dandelionChart(data.current)
+                return "M" + 0 + "," + 0
+                    + " " + dandelion_gap + "," + 0;
             })
+            .attr('stroke', '#d5b1f8')
+            .attr('stroke-width', 5)
+
+
+
+        // // 画 gate label
+        link_g.append('rect')
+            .attr('x', dandelion_gap/2-link_label_bg_size/2)
+            .attr('y', -link_label_bg_size/2)
+            .attr('width', link_label_bg_size)
+            .attr('height', link_label_bg_size)
+            // .attr('rx', rx)
+            .attr('fill', '#ffffff')
+
+
+        let gate_label = link_g.append('text')
+            .html('H')
+            .attr('transform', `translate(${dandelion_gap/2 - 15}, ${10})`)
+            .style('font-size', '2.5em')
+            .style('fill', '#aa37e8')
+            .style('font-weight', 'bold')
+            .style('font-style', 'italic')
+
+
+
 
     }
 
@@ -123,32 +201,177 @@ function Dandelion(){
     // mount 的时候渲染一次
     useEffect(()=>{
 
-        // 画 dandelion Chart
-        render_from_data()
+        axios.get(`data/qiskit_grover_2q.json`)
+            // axios.get(`data/temp.json`)
+            .then(res=>{
+
+                data.current = res.data
+
+
+
+                // 统计所有出现的states，e.g., ['00', '01', '10', '11']
+                states.current = Object.values(data.current).reduce((arr, d)=>{
+
+                    Object.values(d).forEach(d0=>{
+
+                        Object.values(d0['hubs']).forEach(_d=>{
+                            Object.values(_d['states']).forEach(__d=>{
+                                if(!arr.includes(__d['state'])){
+                                    arr.push(__d['state'])
+                                }
+                            })
+                        })
+                    })
+
+                    return arr
+
+                }, [])
+                    .sort()// 按 ['00', '01', '10', '11'] 这样的顺序排序
+
+
+
+
+
+                /////////////// 定义一些变量 ///////////////
+
+                const svg_width = 800, svg_height = 360
+
+
+
+
+                // 创建 svg 画布
+                svg.current = d3.select('#dandelion_container')
+                    .append('svg')
+                    .attr('width', svg_width)
+                    .attr('height', svg_height)
+                    .attr('class', `view_svg`)
+
+
+
+            })
+
+
 
     }, [])
 
 
 
-    // 当 algo 更新的时候update
+    // 情况一：当 statevector 更新的时候update
     useEffect(()=>{
 
 
         // 跳过第一次 mount
-        if(!didMount.current){
-            didMount.current = true
+        if(!didMount1.current){
+            didMount1.current = true
 
             return
         }
 
-    }, [])
+        add_dandelion(statevector)
+
+        console.log('Dandelion update - statevector')
+
+
+    }, [statevector])
+
+
+
+
+    // 情况二：当 theta 更新的时候update
+    useEffect(()=>{
+
+
+        // 跳过第一次 mount
+        if(!didMount2.current){
+            didMount2.current = true
+
+            return
+        }
+
+
+        // 定义长宽
+        const container_width = d3.select('.dandelion_container ').select('rect').attr('width')
+        const container_height = d3.select('.dandelion_container ').select('rect').attr('height')
+        const view_padding_left = 10, view_padding_top = 10
+
+        let exp = 1
+
+
+        let content_width = container_width  - 2*view_padding_left
+        let content_height = container_height - 2*view_padding_top
+
+
+        let scale_new_x_pow = d3.scalePow()
+            .domain([-1, 1])
+            .range([-content_width/2, content_width/2])
+            .exponent(exp)
+
+
+        let scale_new_y_pow = d3.scalePow()
+            .domain([-1, 1])
+            .range([content_width/2, -content_width/2])
+            .exponent(exp)
+
+
+
+        // 先清除所有的旧circle
+        d3.selectAll(`#dandelion_circle`)
+            .remove()
+
+
+
+        // 根据新的theta 渲染新的circle
+        d3.selectAll('#state_g')
+            .append('circle')
+            .attr('id', 'dandelion_circle')
+            .attr("r", d=>Math.sqrt(Math.pow(-scale_new_x_pow(d['state_vector'][0]) * theta, 2) + Math.pow(-scale_new_y_pow(d['state_vector'][1]) * theta, 2)))
+            .attr("cx", d=>-scale_new_x_pow(d['state_vector'][0]) * theta)
+            .attr("cy", d=>-scale_new_y_pow(d['state_vector'][1]) * theta)
+            .style("stroke", (d,i)=>state_color_point[d['name']])
+            .style("stroke-width", 1)
+            .style("fill", (d,i)=>state_color_fill[d['name']])
+            .style('opacity', 0.8)
+
+
+        console.log(`Dandelion update - theta ${theta}`)
+
+
+    }, [theta])
+
+
+
+
+    // 情况三：当 statevector 更新的时候update
+    useEffect(()=>{
+
+
+        // 跳过第一次 mount
+        if(!didMount3.current){
+            didMount3.current = true
+
+            return
+        }
+
+        d3.selectAll('#view3_point')
+            .attr("r", setPoint_radius)
+
+
+        console.log('Dandelion update - point_size')
+
+
+    }, [setPoint_radius])
+
+
 
 
 
 
 
     return (
-        <div id="dandelion_container"></div>
+
+        <>
+            <div id="dandelion_container" style={{height: '1400px', overflow: 'scroll'}}></div>
+        </>
 
     )
 

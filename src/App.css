@@ -78,3 +78,28 @@ html, body{
   fill: #4b4b4b;
   font-size: 2em;
 }
+
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+
+#path_animation{
+  -webkit-animation: dash 30s linear infinite;
+  stroke-dasharray: 6;
+}
+
+
+#path_animation_dandelion{
+  -webkit-animation: dash 50s linear infinite;
+  stroke-dasharray: 12 3;
+
+}
+
+.dandelion_div{
+  border: solid 2px #6c6c6c;
+  background: #EDF0F4;
+}
