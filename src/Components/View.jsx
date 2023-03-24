@@ -4,12 +4,16 @@ import * as d3 from 'd3'
 
 
 import {view1_colorScheme, view1_area_color, view1_stroke_color} from "../function/view1_colorScheme";
+import {state_light, state_color_point, state_dark, state_Light} from "../function/color_scheme";
 
 
 function View(props) {
 
 
-    const param_algo = props.param_algo || 'example'
+
+
+    // 获取要渲染的 algo
+    const param_algo = props.param_algo
 
 
     ///////////////////// 声明一些 State 和 Ref /////////////////////////
@@ -39,7 +43,8 @@ function View(props) {
 
 
     ///////////////////// 定义颜色 //////////////////////
-    const color_null = '#444444', color_h = '#e08080'
+    const color_null = '#444444', color_h = '#e08080', color_x = '#d7c662'
+    const color_cx = '#6b84c2', color_cx_control_on='#73cb6f', color_cx_control_off='#894949'
 
 
     ///////////////////////  View 1 的画图函数  /////////////////////
@@ -266,10 +271,14 @@ function View(props) {
         let stacked_data = d3.stack().keys(keys)(values)
 
 
+        // 画area chart
         area_g.selectAll('.null')
             .data(stacked_data)
             .join('path')
-            .style('fill', (d, i) => view1_state_areaColorScale(d['key']))
+            // .each(d=>{
+            //     console.log(d['key'])
+            // })
+            .style('fill', (d, i) => state_Light[d['key']])
             .attr('d', d3.area()
                 .curve(d3.curveBumpX)
                 .x(function (d, i) {
@@ -300,7 +309,7 @@ function View(props) {
             .attr('x2', (d, i) => i * block_width)
             .attr('y2', d => view1_y(d[1]))
             .style('stroke', function (x) {
-                return view1_state_colorScale(+d3.select(this).node().parentNode.getAttribute('id').split('-')[1])
+                return state_dark[d3.select(this).node().parentNode.getAttribute('id').split('-')[1]]
             })
             .style('stroke-width', 3)
 
@@ -386,26 +395,32 @@ function View(props) {
             .attr('width', view1_label_width)
             .attr('height', view1_label_height)
             .attr('fill', '#ffffff')
-            .attr('stroke', d => view1_state_colorScale(d[4]))
-            .attr('stroke-width', 3)
+            .attr('stroke', d => state_dark[d[4]])
+            .attr('stroke-width', 2)
             .attr('rx', 4)
 
 
         area_label_g.append('text')
             .html(d => `|${d[4]}&#x27E9`)
             .attr('transform', `translate(${view1_label_width / 5}, ${view1_label_height / 1.4})`)
-            .style('font-size', '1.1em')
-            .style('fill', d => view1_state_colorScale(d[4]))
+            .style('font-size', '1em')
+            .style('fill', d => state_dark[d[4]])
             .style('font-weight', 'bold')
 
 
 
         ///////////////// 测试 brushing ////////////////
-        d3.select('.svg')
-            .call(d3.brushX()
-                .extent( [ [0,0], [view1_width,view1_height+3*view1_margin_top+2*view1_padding_top_bottom+view1_title_height] ] )
-                .on('end', brush_function)
-            )
+
+        let myBrush = d3.brushX()
+            .extent( [ [-30,-30], [view1_width,view1_height+3*view1_margin_top+2*view1_padding_top_bottom+view1_title_height-20] ] )
+            .on('end', brush_function)
+
+
+        view1
+            .call(myBrush)
+
+
+
 
 
         // // 画这个View的 title
@@ -471,9 +486,9 @@ function View(props) {
             selection_data = [...new Set(selection_data)]
 
 
-
             /* 重新画 view2 */
             draw_view2(data, selection_data)
+
 
 
 
@@ -526,7 +541,7 @@ function View(props) {
 
 
         //////////// 获取参数 //////////
-        console.log('View1 update')
+        console.log('View2 update')
 
         let change_statevector = props.change_statevector
 
@@ -683,7 +698,6 @@ function View(props) {
             // .selectAll('.null')
             // .data(d=>d)
             .append('rect')
-            .attr('class', 'block_bg')
             .attr('x', 0)
             .attr('y', -state_height / 2)
             .attr('width', block_width)
@@ -691,14 +705,24 @@ function View(props) {
             // .attr('fill', d=>+d['block'].match(/\d+$/)[0] % 2 == 0? 'rgb(250,250,250)': '#ffffff')
             .attr('fill', d => +d['block'].match(/\d+$/)[0] % 2 == 0 ? view2_bgColor_0 : view2_bgColor_1)
             .style('cursor', 'pointer')
+            .attr('class', function(d){
+                return d['hubs']['statehub0']['states']['state0']['post_gate']
+            })
             // 点击刷新dandelion chart的函数
             .on('click', function(_,d){
-                // console.log(step_data)
-                // console.log(_)
-                // console.log(d)
-                // console.log(this)
-                // console.log(d3.select(this).node())
+                console.log(_)
+                console.log(d)
+                console.log(this)
+                console.log(d3.select(this).node())
 
+
+                // 赋给class gate的种类
+                let dandelion_chart_num = d3.selectAll('.bundle_container ').size()
+
+                d3.select(this).attr('id', `dandelion_id_${dandelion_chart_num}`)
+
+
+                // 更新 dandelion chart的数据值
                 let vector_1 = d['statevector']
 
                 // 根据vector_1找vector_2， 即下一个step的 state vector
@@ -714,7 +738,9 @@ function View(props) {
 
 
                 change_statevector(vector_1, vector_2)
+
             })
+
 
 
 
@@ -818,6 +844,15 @@ function View(props) {
             })
             .join('path')
             .attr("d", function (d, i) {
+
+                // brushing的bug， 如果没有后面的节点，就不画了， 直接退出
+                if(!d3.select(`.${d['target']}`).node()){
+                    return
+                }
+
+                // console.log(123)
+                // console.log(d)
+                // console.log(d3.select(`.${d['target']}`).node())
 
                 // let target = d3.select(`.${d['target']}`).node()
                 // let target_parent = d3.select(`.${d['target']}`).node().parentNode
@@ -930,11 +965,11 @@ function View(props) {
 
 
 
-
-        let before_arr = [] // 存放所有state before的links
-        let after_arr = [] // 存放所有after before的links
-
-        // 给state绑定 hover 的交互 ---- 出现前方的所有的link的加粗的线
+       //
+       //  let before_arr = [] // 存放所有state before的links
+       //  let after_arr = [] // 存放所有after before的links
+       //
+       //  // 给state绑定 hover 的交互 ---- 出现前方的所有的link的加粗的线
        //  state_g.on('mouseover', (d, item)=>{
        //
        //      let data = selectArr.current
@@ -1009,7 +1044,7 @@ function View(props) {
        //      d3.selectAll('.ref_line')
        //          .remove()
        //  })
-       //
+
 
     }
 
@@ -1018,9 +1053,11 @@ function View(props) {
     function draw_view3(element, data, e) {
 
 
-        console.log(element)
-        console.log(data)
-        console.log(e)
+        // console.log(element)
+        // console.log(data)
+        // console.log(e)
+        //
+        // return
 
 
         /////////////// 构造initial state的数组 ////////////
@@ -1111,11 +1148,12 @@ function View(props) {
         // console.log(initial_state_arr)
 
 
+
         /////////////// 构造gate_arr 的数组 ////////////
         let gate_arr = []
 
         // gate是Hadamard gate的情况
-        if (element['post_gate'] == 'h') {
+        if (element['post_gate'] == 'h' || element['post_gate'] == 'x'  || element['post_gate'] == 'cx') {
 
             gate_arr = initial_state_arr.map((d, i) => {
                 if (i == element['act_on']) {
@@ -1125,6 +1163,9 @@ function View(props) {
                 return ''
             })
         }
+
+        // console.log(gate_arr)
+
 
 
         /////////////// 构造 final_state_arr 的数组 ////////////
@@ -1163,7 +1204,26 @@ function View(props) {
                 return arr
 
             }, [])
+        }else if(element['post_gate'] == 'x' || element['post_gate'] == 'cx'){
+
+            element['children'].forEach(child=>{
+                final_arr.push(...d3.select(`.${child}`).data()[0]['state'].split(''))
+                // console.log(d3.select(`.${child}`).data()[0])
+            })
+
+            console.log(final_arr)
+
+            final_state_arr = final_arr.map(d=>{
+                return [{
+                    'digit': d,
+                    'negative': false
+                }]
+            })
         }
+
+        // console.log(final_state_arr)
+
+
 
 
         // 最终用来画图的数组
@@ -1289,6 +1349,7 @@ function View(props) {
             })
 
 
+
         // 画每个bloc的边框
 
         block_g.append('rect')
@@ -1396,7 +1457,7 @@ function View(props) {
             .data(d=>d['data'])
             .join('text')
             .html(d => {
-                console.log(d)
+                // console.log(d)
                 // if (d['data'].length == 1) {
                 //     return `|${d['data'][0]['digit']}&#x27E9`
                 // } else if (d['data'].length == 2) {
@@ -1433,6 +1494,98 @@ function View(props) {
 
         ////////////// 画 operation 的箭头 ///////////
 
+
+        // x gate 的 operation 线
+        if(element['post_gate']== 'x'){
+
+            row_g
+                //     .each(d=>{
+                //     console.log(d)
+                // })
+                .filter(d => d['operation'] == '')
+                .append('line')
+                .attr('x1', cell_width_unit / 2)
+                .attr('y1', cell_height_digit + 10)
+                .attr('x2', cell_width_unit / 2)
+                .attr('y2', cell_height_digit + cell_height_operation-10)
+                .style('stroke', color_null)
+                .style('stroke-width', 3)
+                .attr('stroke-dasharray', 5)
+                .attr("marker-end", `url(#${get_marker(color_null)})`)
+
+
+            row_g
+                .filter(d => d['operation'] == 'x')
+                .append('line')
+                .attr('x1', cell_width_unit / 2)
+                .attr('y1', cell_height_digit + 10)
+                .attr('x2', cell_width_unit / 2)
+                .attr('y2', cell_height_digit + cell_height_operation-10)
+                .style('stroke', color_x)
+                .style('stroke-width', 3)
+                // .attr('stroke-dasharray', 5)
+                .attr("marker-end", `url(#${get_marker(color_x)})`)
+        }
+
+
+        // cx gate 的 operation 线
+        if(element['post_gate']== 'cx'){
+
+            row_g
+                //     .each(d=>{
+                //     console.log(d)
+                // })
+                .filter(d => d['operation'] == '')
+                .append('line')
+                .attr('x1', cell_width_unit / 2)
+                .attr('y1', cell_height_digit + 10)
+                .attr('x2', cell_width_unit / 2)
+                .attr('y2', cell_height_digit + cell_height_operation-10)
+                .style('stroke', color_null)
+                .style('stroke-width', 3)
+                .attr('stroke-dasharray', 5)
+                .attr("marker-end", `url(#${get_marker(color_null)})`)
+
+
+            row_g
+                .filter(d => d['operation'] == 'cx')
+                .append('line')
+                .attr('x1', cell_width_unit / 2)
+                .attr('y1', cell_height_digit + 10)
+                .attr('x2', cell_width_unit / 2)
+                .attr('y2', cell_height_digit + cell_height_operation-10)
+                .style('stroke', color_cx)
+                .style('stroke-width', 3)
+                // .attr('stroke-dasharray', 5)
+                .attr("marker-end", `url(#${get_marker(color_cx)})`)
+
+
+            console.log(element)
+
+            // 画control qubit的线
+            block_g.append('path')
+                .attr("d", function(d, i){
+
+                    let control = element['control']
+                    let target = element['act_on']
+
+                    let x0 = view3_padding + cell_width_unit/2 + cell_width_unit*control
+                    let y0 = view3_padding + cell_height_digit
+                    let x1 = view3_padding + cell_width_unit/2 + cell_width_unit*target
+                    let y1 = view3_padding + cell_height_digit + cell_height_operation/2
+
+
+                    return "M" + x0 + "," + (y0+10)
+                        + "C" + x0 + "," + (y0 + 50)
+                        + " " + x1 + "," + (y1 - 20)
+                        + " " + x1 + "," + (y1 +20)
+                })
+                .attr('fill', 'none')
+                .attr('stroke', +single_qubit_arr[element['control']]['initial_digit'][0]['digit']==1?color_cx_control_on: color_cx_control_off)
+                .attr('stroke-width', 3)
+
+
+        }
 
 
         // h gate的operation的线
@@ -1685,7 +1838,9 @@ function View(props) {
         //请求数据函数，基于请求到的数据 调用 render_view 画图
         function render_from_data() {
 
-            axios.get(`data/qiskit_grover_2q.json`)
+        let file_name = param_algo
+
+            axios.get(`data/${file_name}.json`)
                 // axios.get(`data/temp.json`)
                 .then(res => {
 
@@ -1716,10 +1871,22 @@ function View(props) {
 
 
             // 绘制 view2
-            draw_view2(data)
+            // draw_view2(data)
 
         }
 
+
+
+
+
+
+
+
+
+
+
+
+        //////////////////////////////////////////////
 
         // mount 的时候渲染一次
         useEffect(() => {
@@ -1729,24 +1896,39 @@ function View(props) {
         }, [])
 
 
+
+
+
         // 当 algo 更新的时候update
-        // useEffect(()=>{
-        //
-        //
-        //     // 跳过第一次 mount
-        //     if(!didMount.current){
-        //         didMount.current = true
-        //
-        //         return
-        //     }
-        //
-        //
-        //     // 绘制 view2
-        //     console.log('View1 update')
-        //
-        //
-        //
-        // }, [param_algo])
+        useEffect(()=>{
+
+
+            // 跳过第一次 mount
+            if(!didMount.current){
+                didMount.current = true
+
+                return
+            }
+
+
+            ////////////////////////
+            // 删除 view
+            d3.select('.svg')
+                .remove()
+
+
+            ///////////////////////
+
+
+            render_from_data()
+
+
+            // 绘制 view2
+            console.log('View1 update')
+
+
+
+        }, [param_algo])
 
 
         return (

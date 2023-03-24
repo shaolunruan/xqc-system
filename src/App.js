@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
+import * as d3 from 'd3'
 import './App.css';
 
-import { Layout, Row, Col, Form, Radio, ConfigProvider, Select, Space, Slider, InputNumber } from 'antd';
+import {Layout, Row, Col, Form, Radio, ConfigProvider, Select, Space, Slider, InputNumber, Button} from 'antd';
 const { Option } = Select;
 const { Header, Footer, Sider, Content } = Layout;
 import 'antd/dist/reset.css';
@@ -50,7 +51,8 @@ function App() {
 
 
     // 控制 选择的算法
-    const [param_algo, setAlgo] = useState('example')
+    // const [param_algo, setAlgo] = useState('qiskit_grover_2q')
+    const [param_algo, setAlgo] = useState('grover_n2_QASMBench')
     const [statevector, setStatevector] = useState([])
     const [theta, setTheta] = useState(1)
     const [point_radius, setPoint_radius] = useState(8)
@@ -80,6 +82,10 @@ function App() {
         setPoint_radius(value)
     }
 
+    function selection_clear(){
+        d3.select('.selection').style('opacity', 0)
+    }
+
 
 
 
@@ -97,7 +103,7 @@ function App() {
                         <div style={{width: "100%"}}>
                             <SisternodeOutlined  style={{fontSize: '2.5em'}}/>
                             <span className="system-title">QuantumEyes</span>
-                            <span className="paper-title">QuantumEyes: Towards a Better Interpretability of Quantum Circuits</span>
+                            <span className="paper-title">QuantumEyes: Towards Better Interpretability of Quantum Circuits</span>
                         </div>
 
                     </Header>
@@ -109,10 +115,10 @@ function App() {
 
                                 <Form size={'large'} layout={'inline'}>
 
-                                    <Form.Item style={{paddingLeft: '30px', marginRight: '30px'}}>
-                                        <i className="fas fa-pen view_title_icon" style={{fontSize: '1.5em'}}/>
-                                        <span className={'view_title_text'} style={{fontSize: '1.8em'}}> Control panel </span>
-                                    </Form.Item>
+                                    {/*<Form.Item style={{paddingLeft: '30px', marginRight: '30px'}}>*/}
+                                    {/*    <i className="fas fa-pen view_title_icon" style={{fontSize: '1.5em'}}/>*/}
+                                    {/*    <span className={'view_title_text'} style={{fontSize: '1.8em'}}> Control panel </span>*/}
+                                    {/*</Form.Item>*/}
 
 
                                     <Space size={200}>
@@ -122,10 +128,16 @@ function App() {
                                             <Select placeholder="Please select an algorithm"
                                                     defaultValue={param_algo}
                                                     onChange={handleValueChange}
+                                                    size={'large'}
                                             >
-                                                <Option value="example">example</Option>
-                                                <Option value="example2">example2</Option>
+                                                <Option value="qiskit_grover_2q">Grover-n2 Qiskit</Option>
+                                                <Option value="grover_n2_QASMBench">Grover-n2 QASMBench</Option>
                                             </Select>
+                                        </Form.Item>
+
+
+                                        <Form.Item label="View1 selection">
+                                            <Button size={'large'} onClick={selection_clear}>Clear</Button>
                                         </Form.Item>
 
 
@@ -137,6 +149,43 @@ function App() {
                                         {/*        <Radio.Button value="inline">Inline</Radio.Button>*/}
                                         {/*    </Radio.Group>*/}
                                         {/*</Form.Item>*/}
+
+
+                                        <Form.Item label="Point radius:" style={{width: '320px'}}>
+                                            <Row>
+
+
+                                                <Col>
+                                                    <Slider
+                                                        step={0.5}
+                                                        min={0}
+                                                        max={8}
+                                                        style={{width: '100px'}}
+                                                        defaultValue={8}
+                                                        // min={this.state.view2_qual_extent[0]}
+                                                        // max={this.state.view2_qual_extent[1]}
+                                                        // onAfterChange={setTheta}
+                                                        onChange={change_pointRadius}
+                                                        // disabled={check1()}
+                                                    />
+                                                </Col>
+                                                &nbsp;&nbsp;&nbsp;
+                                                <Col>
+                                                    <InputNumber
+                                                        /*min={1}
+                                                        max={20}*/
+                                                        value={point_radius}
+                                                        controls={false}                                                        onChange={change_theta}
+                                                        onChange={change_pointRadius}
+                                                        style={{width: '50px'}}
+                                                    />
+                                                </Col>
+
+                                            </Row>
+
+                                        </Form.Item>
+
+
 
 
                                         <Form.Item label="Circle radius:" style={{width: '320px'}}>
@@ -165,40 +214,6 @@ function App() {
                                                         value={theta}
                                                         controls={false}                                                        onChange={change_theta}
                                                         onChange={change_theta}
-                                                        style={{width: '50px'}}
-                                                    />
-                                                </Col>
-
-                                            </Row>
-
-                                        </Form.Item>
-
-                                        <Form.Item label="Point radius:" style={{width: '320px'}}>
-                                            <Row>
-
-
-                                                <Col>
-                                                    <Slider
-                                                        step={0.5}
-                                                        min={0}
-                                                        max={8}
-                                                        style={{width: '100px'}}
-                                                        defaultValue={8}
-                                                        // min={this.state.view2_qual_extent[0]}
-                                                        // max={this.state.view2_qual_extent[1]}
-                                                        // onAfterChange={setTheta}
-                                                        onChange={change_pointRadius}
-                                                        // disabled={check1()}
-                                                    />
-                                                </Col>
-                                                &nbsp;&nbsp;&nbsp;
-                                                <Col>
-                                                    <InputNumber
-                                                        /*min={1}
-                                                        max={20}*/
-                                                        value={point_radius}
-                                                        controls={false}                                                        onChange={change_theta}
-                                                        onChange={change_pointRadius}
                                                         style={{width: '50px'}}
                                                     />
                                                 </Col>
@@ -239,7 +254,9 @@ function App() {
                                 <Row gutter={30}  justify="center" style={{height: "20%"}}>
                                     <div className={'component'} style={{width: '95%', height: "100%"}}>
 
-                                        <OriginCircuit></OriginCircuit>
+                                        <OriginCircuit
+                                            param_algo={param_algo}
+                                        ></OriginCircuit>
 
                                     </div>
                                 </Row>
@@ -253,6 +270,7 @@ function App() {
                             <div className={'component dandelion_div'} style={{height: "100%"}}>
 
                                 <Dandelion
+                                    param_algo={param_algo}
                                     statevector={statevector}
                                     theta={theta}
                                     point_radius={point_radius}
@@ -260,7 +278,7 @@ function App() {
 
                             </div>
                         </Col>
-                    </Row>
+                    </Row>t
 
                 </Content>
             </Layout>
@@ -269,7 +287,9 @@ function App() {
 
 
             {/*    把 Legend 放这里*/}
-            <Legend></Legend>
+            <Legend
+                param_algo={param_algo}
+            ></Legend>
 
 
         </ConfigProvider>

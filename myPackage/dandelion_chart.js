@@ -1,5 +1,4 @@
 import * as d3 from 'd3'
-import {colorMap_circle_fill, colorMap_circle_border, colorMap_point} from "./view1_colorScheme";
 import {state_color_fill, state_color_border, state_color_point} from "./color_scheme";
 
 

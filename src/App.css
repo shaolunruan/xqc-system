@@ -103,3 +103,7 @@ html, body{
   border: solid 2px #6c6c6c;
   background: #EDF0F4;
 }
+
+.selection{
+  opacity: 0.6;
+}

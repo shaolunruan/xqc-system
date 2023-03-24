@@ -5,14 +5,14 @@ import * as d3 from 'd3'
 
 
 import {colorMap_circle_fill, colorMap_circle_border, colorMap_point} from "../function/view1_colorScheme";
-import {state_color_point, state_color_fill, state_color_border} from "../function/color_scheme";
+import {state_dark, state_Light, state_light} from "../function/color_scheme";
 
 
 function Dandelion(props){
 
 
-
-    const statevector = props.statevector || 'example'
+    const param_algo = props.param_algo
+    const statevector = props.statevector
     const theta = props.theta || 1
     const setPoint_radius = props.point_radius || 8
 
@@ -73,10 +73,10 @@ function Dandelion(props){
         let state_vector_1 =
             statevector[0] ||
             [
-            [0.13, 0.428],
+            [-0.13, 0.428],
             [0.07, -0.495],
-            [0.1, 0.2],
-            [0.4, 0.3]
+            [-0.1, -0.2],
+            [0.5, 0.5]
         ]
 
 
@@ -183,7 +183,13 @@ function Dandelion(props){
 
 
         let gate_label = link_g.append('text')
-            .html('H')
+            .html(d=>{
+
+                let dandelion_chart_num = d3.selectAll('.bundle_container').size()-1
+
+                return d3.select(`#dandelion_id_${dandelion_chart_num}`).attr('class')
+
+            })
             .attr('transform', `translate(${dandelion_gap/2 - 15}, ${10})`)
             .style('font-size', '2.5em')
             .style('fill', '#aa37e8')
@@ -201,7 +207,10 @@ function Dandelion(props){
     // mount 的时候渲染一次
     useEffect(()=>{
 
-        axios.get(`data/qiskit_grover_2q.json`)
+        let file_name = param_algo
+
+
+        axios.get(`data/${file_name}.json`)
             // axios.get(`data/temp.json`)
             .then(res=>{
 
@@ -327,9 +336,9 @@ function Dandelion(props){
             .attr("r", d=>Math.sqrt(Math.pow(-scale_new_x_pow(d['state_vector'][0]) * theta, 2) + Math.pow(-scale_new_y_pow(d['state_vector'][1]) * theta, 2)))
             .attr("cx", d=>-scale_new_x_pow(d['state_vector'][0]) * theta)
             .attr("cy", d=>-scale_new_y_pow(d['state_vector'][1]) * theta)
-            .style("stroke", (d,i)=>state_color_point[d['name']])
+            .style("stroke", (d,i)=>state_dark[d['name']])
             .style("stroke-width", 1)
-            .style("fill", (d,i)=>state_color_fill[d['name']])
+            .style("fill", (d,i)=>state_light[d['name']])
             .style('opacity', 0.8)
 
 
@@ -360,6 +369,31 @@ function Dandelion(props){
 
 
     }, [setPoint_radius])
+
+
+
+    // 情况四：换 algo时重新刷新 dandelion chart
+    useEffect(()=>{
+
+
+        // 跳过第一次 mount
+        if(!didMount3.current){
+            didMount3.current = true
+
+            return
+        }
+
+
+        // 删除dandelion chart
+        d3.selectAll('.bundle_container')
+            .remove()
+
+        d3.select('.view_svg')
+            .attr('width', 800)
+            .attr('height', 360)
+
+
+    }, [param_algo])
 
 
 

@@ -5,7 +5,12 @@ import {view1_colorScheme} from "../function/view1_colorScheme";
 
 
 
-function OriginCircuit(){
+function OriginCircuit(props){
+
+
+
+    const param_algo = props.param_algo
+
 
 
 
@@ -59,7 +64,6 @@ function OriginCircuit(){
 
 
                 qubit_obj['gate'] = _d['hubs']['statehub0']['states']['state0']['post_gate']
-                qubit_obj['gate_name']  = _d['hubs']['statehub0']['states']['state0']['post_gate_name']
                 qubit_obj['qubit']  = _d['hubs']['statehub0']['states']['state0']['act_on']
 
                 operation_arr.push(qubit_obj)
@@ -113,7 +117,7 @@ function OriginCircuit(){
             .append('svg')
             .attr('width', svg_width)
             .attr('height', svg_height)
-            .classed('svg', true)
+            .classed('svg_originalCircuit', true)
 
 
         let view4 = svg.append('g')
@@ -214,9 +218,9 @@ function OriginCircuit(){
             .attr("r", gate_circle_radius)
             .attr("cx", block_width/2)
             .attr("cy", 0)
-            .style("stroke", "#ffffff")
+            .style("stroke", "#636363")
             .style("stroke-width", 4)
-            .style("fill", "#fadddd")
+            .style("fill", "#ffffff")
 
 
 
@@ -229,7 +233,8 @@ function OriginCircuit(){
             .style('font-size', '1.9em')
             .style('font-weight', 'bold')
             .style('font-style', 'italic')
-            .style('fill', '#636363')
+
+            .style('fill', "#636363")
 
 
 
@@ -313,7 +318,10 @@ function OriginCircuit(){
     //请求数据函数，基于请求到的数据 调用 render_view 画图
     function render_from_data(){
 
-        axios.get(`data/qiskit_grover_2q.json`)
+
+        let file_name = param_algo
+
+        axios.get(`data/${file_name}.json`)
             // axios.get(`data/temp.json`)
             .then(res=>{
 
@@ -350,7 +358,16 @@ function OriginCircuit(){
             return
         }
 
-    }, [])
+
+        d3.select('.svg_originalCircuit')
+            .remove()
+
+
+        // 画 OriginCircuit
+        render_from_data()
+
+
+    }, [param_algo])
 
 
 

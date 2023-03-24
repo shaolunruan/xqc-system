@@ -4,10 +4,14 @@ import * as d3 from 'd3'
 
 import {colorMap_circle_border, colorMap_point, colorMap_circle_fill} from "../function/view1_colorScheme";
 import {view1_colorScheme} from "../function/view1_colorScheme";
+import {state_Light, state_light, state_dark, state_color_point} from "../function/color_scheme";
 
 
+function Legend(props){
 
-function Legend(){
+
+    const param_algo = props.param_algo
+
 
 
 
@@ -46,6 +50,7 @@ function Legend(){
 
 
 
+
         function generateStates(n){
             var states = [];
 
@@ -62,11 +67,13 @@ function Legend(){
         }
 
 
-        all_states = ['101','000','110', '111', '001', '011', '100' ].sort()
+        // all_states = ['101','000','110', '111', '001', '011', '100' ].sort()
 
         let power = all_states[0].length
 
         let entire_states = generateStates(power).sort()
+
+        // console.log(entire_states)
 
 
         /////////////// 定义一些变量 ///////////////
@@ -136,7 +143,10 @@ function Legend(){
             .attr('y', 0)
             .attr('width', cell_width_height)
             .attr('height', cell_width_height)
-            .attr('fill', index=>all_states.includes(entire_states[index])? colorMap_point[index]: '#ffffff')
+            // .each(d=>{
+            //     console.log(d)
+            // })
+            .attr('fill', index=>all_states.includes(entire_states[index])? Object.values(state_light)[index]: '#ffffff')
 
 
 
@@ -184,10 +194,11 @@ function Legend(){
     // 获取数据然后调用 render_legend 函数画图
     function get_data_and_render(){
 
+        let file_name = param_algo
+
 
         // 画 OriginCircuit
-
-        axios.get(`data/qiskit_grover_2q.json`)
+        axios.get(`data/${file_name}.json`)
             // axios.get(`data/temp.json`)
             .then(res=>{
 
@@ -219,7 +230,15 @@ function Legend(){
             return
         }
 
-    }, [])
+
+        // 删除dandelion chart
+        d3.selectAll('.legend_svg')
+            .remove()
+
+        get_data_and_render()
+
+
+    }, [param_algo])
 
 
 
@@ -229,7 +248,7 @@ function Legend(){
         <div id="legend_container" style={{
             position: 'absolute',
             top: "93px",
-            right: '267px'
+            right: '167px'
         }}></div>
 
     )
