@@ -121,7 +121,7 @@ function App() {
                                     {/*</Form.Item>*/}
 
 
-                                    <Space size={200}>
+                                    <Space size={150}>
 
 
                                         <Form.Item label="Algo selection">
@@ -132,6 +132,7 @@ function App() {
                                             >
                                                 <Option value="qiskit_grover_2q">Grover-n2 Qiskit</Option>
                                                 <Option value="grover_n2_QASMBench">Grover-n2 QASMBench</Option>
+                                                <Option value="qft_n3_Qiskit">QFT-n3 Qiskit</Option>
                                             </Select>
                                         </Form.Item>
 
@@ -151,7 +152,7 @@ function App() {
                                         {/*</Form.Item>*/}
 
 
-                                        <Form.Item label="Point radius:" style={{width: '320px'}}>
+                                        <Form.Item label="Dandelion point radius:" style={{width: '450px'}}>
                                             <Row>
 
 
@@ -188,7 +189,7 @@ function App() {
 
 
 
-                                        <Form.Item label="Circle radius:" style={{width: '320px'}}>
+                                        <Form.Item label="Dandelion circle radius:" style={{width: '450px'}}>
                                             <Row>
 
 

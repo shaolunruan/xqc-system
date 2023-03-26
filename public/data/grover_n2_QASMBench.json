@@ -474,7 +474,7 @@
                             "act_on": 1,
                             "control": "",
                             "children": ["block9_step1_state1"],
-                            "positive": true
+                            "positive": false
                         },
                         "state3": {
                             "token": "block9_step0_state3",
@@ -562,7 +562,7 @@
                             "act_on": 1,
                             "control": "",
                             "children": [],
-                            "positive": true
+                            "positive": false
                         }
                     },
                     "probability": 1

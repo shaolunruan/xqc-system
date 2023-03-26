@@ -248,7 +248,7 @@ function Legend(props){
         <div id="legend_container" style={{
             position: 'absolute',
             top: "93px",
-            right: '167px'
+            right: '100px'
         }}></div>
 
     )

@@ -137,9 +137,20 @@ function Dandelion(props){
             // .attr('stroke-width', '2px')
 
 
+        let n1 = Math.log2(state_vector_1.length)
+        let state_names_1 = generateStates(n1).sort()
+
+
+        let n2 = Math.log2(state_vector_2.length)
+        let state_names_2 = generateStates(n2).sort()
+
+
+        // return;
+
+
         /////////////////////// 在这里调用 dandelion_chart 函数 /////////////////////
-        dandelion_chart(state_vector_1, states.current, bundle_g, [dandelion_width, dandelion_width], [0,0], theta)
-        dandelion_chart(state_vector_2, states.current, bundle_g, [dandelion_width, dandelion_width], [dandelion_width+dandelion_gap,0], theta)
+        dandelion_chart(state_vector_1, state_names_1, bundle_g, [dandelion_width, dandelion_width], [0,0], theta)
+        dandelion_chart(state_vector_2, state_names_2, bundle_g, [dandelion_width, dandelion_width], [dandelion_width+dandelion_gap,0], theta)
 
 
 
@@ -199,6 +210,23 @@ function Dandelion(props){
 
 
 
+    }
+
+
+    // 生成 binary的string
+    function generateStates(n){
+        var states = [];
+
+        // Convert to decimal
+        var maxDecimal = parseInt("1".repeat(n),2);
+
+        // For every number between 0->decimal
+        for(var i = 0; i <= maxDecimal; i++){
+            // Convert to binary, pad with 0, and add to final results
+            states.push(i.toString(2).padStart(n,'0'));
+        }
+
+        return states;
     }
 
 

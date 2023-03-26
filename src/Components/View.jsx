@@ -461,6 +461,22 @@ function View(props) {
         // view 1 的brush的函数
         function brush_function(event){
 
+            // 删除view3
+            d3.select('.view3')
+                .remove()
+
+            d3.selectAll('.view3_line')
+                .remove()
+
+            d3.selectAll('.bundle_container ')
+                .remove()
+
+            d3.select('.view_svg')
+                .attr('width', 800)
+                .attr('height', 360)
+
+
+
             const selection = event.selection
 
             const [startX1, startX2] = selection;
@@ -488,6 +504,7 @@ function View(props) {
 
             /* 重新画 view2 */
             draw_view2(data, selection_data)
+
 
 
 
@@ -710,10 +727,10 @@ function View(props) {
             })
             // 点击刷新dandelion chart的函数
             .on('click', function(_,d){
-                console.log(_)
-                console.log(d)
-                console.log(this)
-                console.log(d3.select(this).node())
+                // console.log(_)
+                // console.log(d)
+                // console.log(this)
+                // console.log(d3.select(this).node())
 
 
                 // 赋给class gate的种类
@@ -927,41 +944,11 @@ function View(props) {
             .style('fill', '#636363')
 
 
-        // 画这个View的 title
-        let view_title = view2.append('g')
-            .attr('class', 'view_title')
-            .attr('transform', `translate(${view2_padding_left_right + 10}, ${view2_padding_top_bottom})`)
 
 
-        // view_title
-        //     .append('text')
-        //     .html(`View Name`)
-        //     .attr('transform', `translate(${45}, ${0})`)
-        //     .attr('class', 'view_title_text')
-        //
-        //
-        // // icon
-        // view_title
-        //     .append('text')
-        //     .attr('transform', `translate(${0}, ${0})`)
-        //     .attr("class", "fa view_title_icon")
-        //     .text('\uf542');
-        //
-        //
-        //
-        // // border
-        // view_title.append('rect')
-        //     .attr('x', -9)
-        //     .attr('y', -35)
-        //     .attr('width', 225)
-        //     .attr('height', 46)
-        //     // .attr('rx', 5)
-        //     .attr('fill', 'none')
-        //     .attr('stroke', "#2f2f2f")
-        //     .attr('stroke-width', '2px')
 
 
-        //////////////////////////  交互 interaction ///////////////////////////////
+        ////////////////////////  交互 interaction ///////////////////////////////
 
 
 
@@ -1171,6 +1158,7 @@ function View(props) {
         /////////////// 构造 final_state_arr 的数组 ////////////
 
         let final_state_arr = []
+        let final_arr_ = []
 
         // Hadamard gate的操作
         if (element['post_gate'] == 'h') {
@@ -1179,6 +1167,11 @@ function View(props) {
             element['children'].forEach(child => {
                 final_arr.push(d3.select(`.${child}`).data()[0]['state'])
             })
+
+            element['children'].forEach(child => {
+                final_arr_.push(d3.select(`.${child}`).data()[0]['state'])
+            })
+
 
 
             final_state_arr = final_arr.reduce(function (arr, d) {
@@ -1206,12 +1199,16 @@ function View(props) {
             }, [])
         }else if(element['post_gate'] == 'x' || element['post_gate'] == 'cx'){
 
+
+            element['children'].forEach(child => {
+                final_arr_.push(d3.select(`.${child}`).data()[0]['state'])
+            })
+
             element['children'].forEach(child=>{
                 final_arr.push(...d3.select(`.${child}`).data()[0]['state'].split(''))
                 // console.log(d3.select(`.${child}`).data()[0])
             })
 
-            console.log(final_arr)
 
             final_state_arr = final_arr.map(d=>{
                 return [{
@@ -1235,7 +1232,7 @@ function View(props) {
             }
         })
 
-        console.log(single_qubit_arr)
+        // console.log(single_qubit_arr)
 
 
 
@@ -1255,7 +1252,7 @@ function View(props) {
         const distance_to_svg_top = view3_margin_top + layout['view1_height'] + layout['view2_height']
         const view3_padding = 12, small_slit = 5
         const view3_gate_trigger_circle = 20
-        const inflection_point = 730
+        const inflection_point = 720
 
 
         const color_final = '#efefef', color_digit_positive = '#a5dcfd',color_digit_negative = '#4394c1', color_operation_bg = '#dedede'
@@ -1293,15 +1290,16 @@ function View(props) {
 
                 let x0 = e.offsetX
                 let y0 = e.offsetY
-                let x1 = d3.selectAll('.view3_block').size() * (block_width + view3_block_horizontal_gap + 2*view3_padding) + block_width / 2 + view3_margin_left
+                let x1 = d3.selectAll('.view3_block').size() * (view3_block_horizontal_gap*5) + block_width / 2 + view3_margin_left
                 let y1 = distance_to_svg_top + view3_padding
 
 
                 return "M" + x0 + "," + (y0 + view3_gate_trigger_circle)
-                    + "L" + x0 + "," + inflection_point
-                    + "L" + x1 + "," + inflection_point
+                    + "L" + x0 + "," + (inflection_point + d3.selectAll('.view3_line').size()*8)
+                    + "L" + x1 + "," + (inflection_point + d3.selectAll('.view3_line').size()*8)
                     + "L" + x1 + "," + y1;
             })
+            .attr('class', 'view3_line')
             .attr('fill', 'none')
             .attr('stroke', '#000000')
             .attr('stroke-width', 1)
@@ -1322,7 +1320,7 @@ function View(props) {
 
 
         let block_g = view3.append('g')
-            .attr('transform', `translate(${d3.selectAll('.view3_block').size() * (block_width + view3_block_horizontal_gap + 2*view3_padding)}, ${view3_padding})`)
+            .attr('transform', `translate(${d3.selectAll('.view3_block').size() * ( view3_block_horizontal_gap*5)}, ${view3_padding})`)
             .attr('class', `view3_block`)
 
 
@@ -1367,7 +1365,7 @@ function View(props) {
         let final_cell = block_g
             .append('g')
             .attr('transform', `translate(${view3_padding},${block_height + 2 * view3_padding - cell_height_digit})`)
-            .datum(final_arr)
+            .datum(final_arr_)
 
 
         final_cell
@@ -1424,7 +1422,7 @@ function View(props) {
         let height_stack = []
 
         row_g.each(d => {
-            console.log(d)
+            // console.log(d)
             height_stack.push(cell_width_unit * d3.max([d['initial_digit'].length, d['final_digit'].length]))
         })
 
@@ -1560,7 +1558,7 @@ function View(props) {
                 .attr("marker-end", `url(#${get_marker(color_cx)})`)
 
 
-            console.log(element)
+            // console.log(element)
 
             // 画control qubit的线
             block_g.append('path')

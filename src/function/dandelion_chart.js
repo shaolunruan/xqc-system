@@ -22,7 +22,7 @@ function dandelion_chart(state_vectors_, states, bundle_g_, size_arr_, position_
 
 
     // 判断 size_arr_, position_arr_ 是否合法
-    if(typeof state_vectors_ !== 'object' || state_vectors_.length !== 4){
+    if(typeof state_vectors_ !== 'object'){
         console.log('Dandelion chart parameter `states` not valid')
 
         return
