@@ -19,7 +19,7 @@ import Legend from "./Components/Legend";
 
 
 
-const HEADER_HEIGHT = 60, WHOLE_MARGIN_LR = 100
+const HEADER_HEIGHT = 40, WHOLE_MARGIN_LR = 100
 
 
 //整体布局的CSS代码放在这里，其余的细节的样式放在 App.css 里面
@@ -30,7 +30,7 @@ const root_comp_style = {
         height: `${HEADER_HEIGHT}px`,
         lineHeight: `${HEADER_HEIGHT-10}px`,
         backgroundColor: '#333b3e',
-        paddingTop: '10px',
+        paddingTop: '8px',
         paddingBottom: '10px',
         marginBottom: '20px',
         // paddingInline: WHOLE_MARGIN_LR
@@ -41,7 +41,7 @@ const root_comp_style = {
         height: "100%",
         border: "solid 1px #515962",
         borderRadius: "12px",
-        padding: "15px"
+        padding: "8px"
     }
 }
 
@@ -101,7 +101,7 @@ function App() {
                 <Content style={root_comp_style.contentStyle}>
                     <Header style={root_comp_style.headerStyle}>
                         <div style={{width: "100%"}}>
-                            <SisternodeOutlined  style={{fontSize: '2.5em'}}/>
+                            <SisternodeOutlined  style={{fontSize: '1.3em'}}/>
                             <span className="system-title">QuantumEyes</span>
                             <span className="paper-title">QuantumEyes: Towards Better Interpretability of Quantum Circuits</span>
                         </div>
@@ -113,7 +113,7 @@ function App() {
                         <Col style={{width: '98%'}}>
                             <div className={'component control_panel'}>
 
-                                <Form size={'large'} layout={'inline'}>
+                                <Form size={'small'} layout={'inline'}>
 
                                     {/*<Form.Item style={{paddingLeft: '30px', marginRight: '30px'}}>*/}
                                     {/*    <i className="fas fa-pen view_title_icon" style={{fontSize: '1.5em'}}/>*/}
@@ -121,24 +121,26 @@ function App() {
                                     {/*</Form.Item>*/}
 
 
-                                    <Space size={150}>
+                                    <Space size={100}>
 
 
-                                        <Form.Item label="Algo selection">
+                                        <Form.Item label="Algo select"
+                                                   style={{ width: 180 }}
+                                                   >
                                             <Select placeholder="Please select an algorithm"
                                                     defaultValue={param_algo}
                                                     onChange={handleValueChange}
-                                                    size={'large'}
+                                                    style={{ width: 100 }}
                                             >
-                                                <Option value="qiskit_grover_2q">Grover-n2 Qiskit</Option>
                                                 <Option value="grover_n2_QASMBench">Grover-n2 QASMBench</Option>
                                                 <Option value="qft_n3_Qiskit">QFT-n3 Qiskit</Option>
+                                                {/*<Option value="qiskit_grover_2q">Grover-n2 Qiskit</Option>*/}
                                             </Select>
                                         </Form.Item>
 
 
                                         <Form.Item label="View1 selection">
-                                            <Button size={'large'} onClick={selection_clear}>Clear</Button>
+                                            <Button size={'small'} onClick={selection_clear}>Clear</Button>
                                         </Form.Item>
 
 
@@ -152,7 +154,7 @@ function App() {
                                         {/*</Form.Item>*/}
 
 
-                                        <Form.Item label="Dandelion point radius:" style={{width: '450px'}}>
+                                        <Form.Item label="Dandelion point:" style={{width: '300px'}}>
                                             <Row>
 
 
@@ -189,7 +191,7 @@ function App() {
 
 
 
-                                        <Form.Item label="Dandelion circle radius:" style={{width: '450px'}}>
+                                        <Form.Item label="Dandelion circle:" style={{width: '300px'}}>
                                             <Row>
 
 
@@ -240,7 +242,7 @@ function App() {
 
                             <Col span={16}>
 
-                                <Row gutter={30}  justify="center" style={{height: "75%", marginBottom: '20px'}}>
+                                <Row gutter={30}  justify="center" style={{height: "72%", marginBottom: '20px'}}>
                                     <div className={'component'} style={{width: '95%', height: "100%"}}>
 
                                         <View
@@ -253,7 +255,7 @@ function App() {
 
 
                                 <Row gutter={30}  justify="center" style={{height: "20%"}}>
-                                    <div className={'component'} style={{width: '95%', height: "100%"}}>
+                                    <div className={'component'} style={{width: '95%', height: "60%"}}>
 
                                         <OriginCircuit
                                             param_algo={param_algo}
@@ -268,7 +270,7 @@ function App() {
 
 
                         <Col  className="gutter-row" span={8}>
-                            <div className={'component dandelion_div'} style={{height: "100%"}}>
+                            <div className={'component dandelion_div'} style={{height: "85%"}}>
 
                                 <Dandelion
                                     param_algo={param_algo}
@@ -279,7 +281,7 @@ function App() {
 
                             </div>
                         </Col>
-                    </Row>t
+                    </Row>
 
                 </Content>
             </Layout>

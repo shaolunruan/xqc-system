@@ -1,4 +1,4 @@
-const state_color_fill = {
+const state_light = {
     '00': '#dce4ea',
     '01': '#ecd7d8',
     '10': '#d1e5d0',
@@ -7,26 +7,42 @@ const state_color_fill = {
     '001': '#ecd7d8',
     '010': '#d1e5d0',
     '011': '#dfc9e2',
-    '100': '#dce4ea',
-    '101': '#ecd7d8',
-    '110': '#d1e5d0',
-    '111': '#dfc9e2',
+    '100': '#f5e4d3',
+    '101': '#cce7e5',
+    '110': '#e5bed7',
+    '111': '#ebefc7',
 }
 
 
-const state_color_border = {
-    '00': '#dce4ea',
-    '01': '#ecd7d8',
-    '10': '#d1e5d0',
-    '11': '#dfc9e2',
-    '000': '#dce4ea',
-    '001': '#ecd7d8',
-    '010': '#d1e5d0',
-    '011': '#dfc9e2',
-    '100': '#dce4ea',
-    '101': '#ecd7d8',
-    '110': '#d1e5d0',
-    '111': '#dfc9e2',
+const state_Light = {
+    '00': '#e4eaec',
+    '01': '#f3e6e7',
+    '10': '#e6eae6',
+    '11': '#ede4ee',
+    '000': '#e4eaec',
+    '001': '#f3e6e7',
+    '010': '#e6eae6',
+    '011': '#ede4ee',
+    '100': '#eae4dc',
+    '101': '#dfeeef',
+    '110': '#e7cbdf',
+    '111': '#e2e0c9',
+}
+
+
+const state_dark = {
+    '00': '#2f6489',
+    '01': '#7d4446',
+    '10': '#50844f',
+    '11': '#75497d',
+    '000': '#2f6489',
+    '001': '#7d4446',
+    '010': '#50844f',
+    '011': '#75497d',
+    '100': '#7b543b',
+    '101': '#306f6e',
+    '110': '#7d3b5c',
+    '111': '#787d39',
 }
 
 
@@ -48,14 +64,18 @@ const state_color_point = {
 
 const gate_color_dark = {
     'h': '#f16767',
-    'z': '#f169ea',
-    'cnot': '#69d6f1',
-    'cz': '#f1ef69'
+    'x': '#57af9a',
+    'z': '#ac53a7',
+    'cx': '#2b8da8',
+    'cz': '#a5a459'
 }
 
 
 export {
-    state_color_border,
-    state_color_fill,
-    state_color_point
+    state_dark,
+    state_light,
+    state_color_point,
+    state_Light,
+
+    gate_color_dark
 }

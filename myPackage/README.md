@@ -8,6 +8,12 @@
 npm install dandelion_chart -S
 ```
 
+
+## Import
+```js
+import {dandelion_chart} from 'dandelion_chart'
+```
+
 ---
 
 ## Tutorial
@@ -28,6 +34,7 @@ npm install dandelion_chart -S
 * `size_arr` *Array* : the size of the dandelion chart
 * `position_arr` *Array* : positio of the dandelion chart
 * `theta` *Number* : the parameters to decrease the area of circles, reducing the visual clutter when there are numerous basic states
+
 
 
 ## Usage example: 

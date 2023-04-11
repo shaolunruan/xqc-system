@@ -94,7 +94,7 @@ function Dandelion(props){
 
 
         /////////////// 定义一些变量 ///////////////
-        const dandelion_width = 315, dandelion_height = 315
+        const dandelion_width = 230, dandelion_height = 315
         const dandelion_gap = 70
         const bundle_width = dandelion_width*2 + dandelion_gap
         const bundle_height = dandelion_width
@@ -155,7 +155,7 @@ function Dandelion(props){
 
 
         let link_g = bundle_g.append('g')
-            .attr('transform', `translate(${dandelion_width},${dandelion_height/2})`)
+            .attr('transform', `translate(${dandelion_width},${dandelion_height/2-30})`)
 
 
         // 连接两个dandelion chart的连线
@@ -432,7 +432,7 @@ function Dandelion(props){
     return (
 
         <>
-            <div id="dandelion_container" style={{height: '1400px', overflow: 'scroll'}}></div>
+            <div id="dandelion_container" style={{height: '850px', overflow: 'scroll'}}></div>
         </>
 
     )

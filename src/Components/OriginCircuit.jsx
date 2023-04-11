@@ -26,12 +26,12 @@ function OriginCircuit(props){
     function draw_originalCircuit(data){
 
 
-        const svg_width = 1600, svg_height = 235
-        const view4_margin_top = 15, view4_margin_bottom = 70, view4_margin_left = 10
-        const view4_padding_top = 10, view4_padding_left_right = 30
+        const svg_width = 1200, svg_height = 180
+        const view4_margin_top = 0, view4_margin_bottom = 70, view4_margin_left = 10
+        const view4_padding_top = -12, view4_padding_left_right = 30
         const view4_padding_bottom = 20
         const view4_title_height = 40
-        const gate_circle_radius = 20
+        const gate_circle_radius = 12
 
 
 
@@ -219,7 +219,7 @@ function OriginCircuit(props){
             .attr("cx", block_width/2)
             .attr("cy", 0)
             .style("stroke", "#636363")
-            .style("stroke-width", 4)
+            .style("stroke-width", 3)
             .style("fill", "#ffffff")
 
 
@@ -230,7 +230,7 @@ function OriginCircuit(props){
         gates.append('text')
             .html(d=>d['gate'])
             .attr('transform', `translate(${block_width/2-gate_circle_radius/2}, ${gate_circle_radius/2})`)
-            .style('font-size', '1.9em')
+            .style('font-size', '1.4em')
             .style('font-weight', 'bold')
             .style('font-style', 'italic')
 

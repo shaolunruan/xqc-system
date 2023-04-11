@@ -27,14 +27,14 @@ function View(props) {
 
 
     let layout_attribute = useRef({
-        'view1_height': 120,
-        'view2_height': 450,
+        'view1_height': 90,
+        'view2_height': 320,
         'margin_top': 20,
         'margin_left': 30,
         'padding_top': 20,
         'padding_left': 20,
 
-        'gap_view1_view2': 60,
+        'gap_view1_view2': 30,
 
         'view_title_height': 0
     })
@@ -43,7 +43,7 @@ function View(props) {
 
 
     ///////////////////// 定义颜色 //////////////////////
-    const color_null = '#444444', color_h = '#e08080', color_x = '#d7c662'
+    const color_null = '#444444', color_h = '#e08080', color_x = '#d7c662', color_s = '#44b8b8'
     const color_cx = '#6b84c2', color_cx_control_on='#73cb6f', color_cx_control_off='#894949'
 
 
@@ -53,7 +53,7 @@ function View(props) {
 
         // 定义布局变量
         const layout = layout_attribute.current
-        const view1_width = 1700, view1_height = layout['view1_height']
+        const view1_width = 1250, view1_height = layout['view1_height']
         const view1_margin_top = layout['margin_top'], view1_margin_left = layout['margin_left']
         const view1_padding_top_bottom = layout['padding_top'], view1_padding_left_right = layout['padding_left']
         const view1_title_width = 150, view1_title_height = layout['view_title_height']
@@ -62,7 +62,7 @@ function View(props) {
         // 定义元素的长和宽
         const content_width = view1_width - 2 * view1_padding_left_right
         const heading_height = 20, tag_gap = 7
-        const view1_label_width = 40, view1_label_height = 25
+        const view1_label_width = 30, view1_label_height = 20
         const gap_heading_area = 10
 
 
@@ -403,7 +403,7 @@ function View(props) {
         area_label_g.append('text')
             .html(d => `|${d[4]}&#x27E9`)
             .attr('transform', `translate(${view1_label_width / 5}, ${view1_label_height / 1.4})`)
-            .style('font-size', '1em')
+            .style('font-size', '0.8em')
             .style('fill', d => state_dark[d[4]])
             .style('font-weight', 'bold')
 
@@ -566,7 +566,7 @@ function View(props) {
 
         // 定义 布局 变量
         const layout = layout_attribute.current
-        const view2_width = 1550, view2_height = layout['view2_height']
+        const view2_width = 1150, view2_height = layout['view2_height']
         const view2_margin_top = 3 * layout['margin_top'] + layout['view1_height'] + layout['view_title_height'] + 2 * layout['padding_top'],
             view2_margin_left = layout['margin_left']
         const view2_padding_top_bottom = layout['padding_top'], view2_padding_left_right = layout['padding_left']
@@ -579,10 +579,10 @@ function View(props) {
 
 
         // 定义元素的长和宽
-        const state_width = 60, state_height = 20
-        const gateCircle_radius = 10, gate_offset = 25
+        const state_width = 45, state_height = 15
+        const gateCircle_radius = 8, gate_offset = 18
         const rx = state_height / 4
-        const gap_width = 5
+        const gap_width = 4
 
 
         // 定义元素的颜色
@@ -797,7 +797,7 @@ function View(props) {
             .attr('x2', state_width + refLine_cap + 2 * gap_width)
             .attr('y2', d => (Object.keys(d['states']).length * hub_height - gap_width) / 2)
             .style('stroke', view2_hubColor)
-            .style('stroke-width', 3)
+            .style('stroke-width', 2)
             .style('stroke-linecap', 'round')
 
 
@@ -911,8 +911,8 @@ function View(props) {
         // 生成每个state 里面的text
         state_g.append('text')
             .html(d => `|${d['state']}&#x27E9`)
-            .attr('transform', `translate(${state_width / 3}, ${state_height / 1.4})`)
-            .style('font-size', '1.2em')
+            .attr('transform', `translate(${state_width / 3-7}, ${state_height / 1.2})`)
+            .style('font-size', '1em')
             .style('fill', '#ffffff')
 
 
@@ -938,7 +938,7 @@ function View(props) {
         gate_g.append('text')
             .html(d => d['post_gate'])
             .attr('transform', `translate(${-gateCircle_radius / 2}, ${gateCircle_radius / 2.5})`)
-            .style('font-size', '1.1em')
+            .style('font-size', '0.9em')
             .style('font-weight', 'bold')
             .style('font-style', 'italic')
             .style('fill', '#636363')
@@ -952,85 +952,85 @@ function View(props) {
 
 
 
-       //
-       //  let before_arr = [] // 存放所有state before的links
-       //  let after_arr = [] // 存放所有after before的links
-       //
-       //  // 给state绑定 hover 的交互 ---- 出现前方的所有的link的加粗的线
-       //  state_g.on('mouseover', (d, item)=>{
-       //
-       //      let data = selectArr.current
-       //
-       //      let before_arr = func_query_before(data, item['token'], [])
-       //
-       //      link.filter(function(d,i,t){
-       //
-       //          return before_arr.includes(this.getAttribute('class'))
-       //      })
-       //          .attr('stroke', view2_linkColor_hover)
-       //          .attr('stroke-width', '3px')
-       //          .attr('stroke-dasharray', 'none')
-       //          .attr('id', null)
-       //
-       //
-       //  })
-       //
-       //
-       //
-       //  // 给state绑定 hover 的交互 ---- 移除前方的所有的link的加粗的线
-       //  state_g.on('mouseout', (d, item)=>{
-       //
-       //      link.attr('stroke', view2_linkColor)
-       //          .attr('stroke-width', view2_link_width)
-       //          .attr('stroke-dasharray', 5)
-       //          .attr('id', 'path_animation')
-       //
-       //
-       //  })
-       //
-       //
-       //  // 给hub绑定hover的交互 ---- 出现 reference line
-       //  hub.on('mouseover', function(d, item){
-       //
-       //
-       //
-       //      let left_point = d3.select(`.${item['name']}`).node().parentNode.getAttribute('transform').split(/[\s,()]+/)[1]
-       //
-       //      let right_point = view2_width - left_point - hub_width + view2_padding_left_right
-       //
-       //
-       //      d3.select(`.${item['name']}`)
-       //          .append('line')
-       //          .attr('x1', -left_point+view2_padding_left_right)
-       //          .attr('y1', d=>(Object.keys(d['states']).length * hub_height-gap_width)/2)
-       //          .attr('x2', 0)
-       //          .attr('y2', d=>(Object.keys(d['states']).length * hub_height-gap_width)/2)
-       //          .style('stroke', '#424242')
-       //          .style('stroke-width', 1)
-       //          .attr('stroke-dasharray', 4)
-       //          .attr('class', 'ref_line')
-       //
-       //
-       //
-       //      d3.select(`.${item['name']}`)
-       //          .append('line')
-       //          .attr('x1', hub_width)
-       //          .attr('y1', d=>(Object.keys(d['states']).length * hub_height-gap_width)/2)
-       //          .attr('x2', right_point)
-       //          .attr('y2', d=>(Object.keys(d['states']).length * hub_height-gap_width)/2)
-       //          .style('stroke', '#424242')
-       //          .style('stroke-width', 1)
-       //          .attr('stroke-dasharray', 4)
-       //          .attr('class', 'ref_line')
-       //
-       //
-       //      })
-       //
-       // // 给hub绑定hover的交互 ---- 隐藏 reference line
-       //  hub.on('mouseout', function(){
-       //      d3.selectAll('.ref_line')
-       //          .remove()
-       //  })
+
+        let before_arr = [] // 存放所有state before的links
+        let after_arr = [] // 存放所有after before的links
+
+        // 给state绑定 hover 的交互 ---- 出现前方的所有的link的加粗的线
+        state_g.on('mouseover', (d, item)=>{
+
+            let data = selectArr.current
+
+            let before_arr = func_query_before(data, item['token'], [])
+
+            link.filter(function(d,i,t){
+
+                return before_arr.includes(this.getAttribute('class'))
+            })
+                .attr('stroke', view2_linkColor_hover)
+                .attr('stroke-width', '3px')
+                .attr('stroke-dasharray', 'none')
+                .attr('id', null)
+
+
+        })
+
+
+
+        // 给state绑定 hover 的交互 ---- 移除前方的所有的link的加粗的线
+        state_g.on('mouseout', (d, item)=>{
+
+            link.attr('stroke', view2_linkColor)
+                .attr('stroke-width', view2_link_width)
+                .attr('stroke-dasharray', 5)
+                .attr('id', 'path_animation')
+
+
+        })
+
+
+        // 给hub绑定hover的交互 ---- 出现 reference line
+        hub.on('mouseover', function(d, item){
+
+
+
+            let left_point = d3.select(`.${item['name']}`).node().parentNode.getAttribute('transform').split(/[\s,()]+/)[1]
+
+            let right_point = view2_width - left_point - hub_width + view2_padding_left_right
+
+
+            d3.select(`.${item['name']}`)
+                .append('line')
+                .attr('x1', -left_point+view2_padding_left_right)
+                .attr('y1', d=>(Object.keys(d['states']).length * hub_height-gap_width)/2)
+                .attr('x2', 0)
+                .attr('y2', d=>(Object.keys(d['states']).length * hub_height-gap_width)/2)
+                .style('stroke', '#424242')
+                .style('stroke-width', 1)
+                .attr('stroke-dasharray', 4)
+                .attr('class', 'ref_line')
+
+
+
+            d3.select(`.${item['name']}`)
+                .append('line')
+                .attr('x1', hub_width)
+                .attr('y1', d=>(Object.keys(d['states']).length * hub_height-gap_width)/2)
+                .attr('x2', right_point)
+                .attr('y2', d=>(Object.keys(d['states']).length * hub_height-gap_width)/2)
+                .style('stroke', '#424242')
+                .style('stroke-width', 1)
+                .attr('stroke-dasharray', 4)
+                .attr('class', 'ref_line')
+
+
+            })
+
+       // 给hub绑定hover的交互 ---- 隐藏 reference line
+        hub.on('mouseout', function(){
+            d3.selectAll('.ref_line')
+                .remove()
+        })
 
 
     }
@@ -1132,8 +1132,6 @@ function View(props) {
         }
 
 
-        // console.log(initial_state_arr)
-
 
 
         /////////////// 构造gate_arr 的数组 ////////////
@@ -1149,9 +1147,20 @@ function View(props) {
 
                 return ''
             })
+            // gate是swap gate的情况
+        }else if(element['post_gate'] == 's'){
+            gate_arr = initial_state_arr.map((d, i) => {
+                if (i == element['act_on']) {
+                    return 's0'
+                }else if (i == element['control']) {
+                    return 's1'
+                }
+
+                return ''
+            })
         }
 
-        // console.log(gate_arr)
+
 
 
 
@@ -1197,7 +1206,7 @@ function View(props) {
                 return arr
 
             }, [])
-        }else if(element['post_gate'] == 'x' || element['post_gate'] == 'cx'){
+        }else if(element['post_gate'] == 'x' || element['post_gate'] == 'cx' || element['post_gate'] == 's'){
 
 
             element['children'].forEach(child => {
@@ -1218,7 +1227,9 @@ function View(props) {
             })
         }
 
-        // console.log(final_state_arr)
+        // console.log(final_arr_)
+        //
+        // return
 
 
 
@@ -1242,17 +1253,17 @@ function View(props) {
 
         // 定义布局变量
         const layout = layout_attribute.current
-        const view3_margin_left = layout['margin_left'] + 20, view3_margin_top = 190
-        const view3_block_horizontal_gap = 50
+        const view3_margin_left = layout['margin_left'] + 20, view3_margin_top = 130
+        const view3_block_horizontal_gap = 40
 
 
-        const cell_width_unit = 50, cell_height_digit = 35, cell_height_operation = 120
+        const cell_width_unit = 35, cell_height_digit = 25, cell_height_operation = 90
 
 
         const distance_to_svg_top = view3_margin_top + layout['view1_height'] + layout['view2_height']
-        const view3_padding = 12, small_slit = 5
-        const view3_gate_trigger_circle = 20
-        const inflection_point = 720
+        const view3_padding = 8, small_slit = 4
+        const view3_gate_trigger_circle = 15
+        const inflection_point = 530
 
 
         const color_final = '#efefef', color_digit_positive = '#a5dcfd',color_digit_negative = '#4394c1', color_operation_bg = '#dedede'
@@ -1390,8 +1401,8 @@ function View(props) {
             //     console.log(d)
             // })
             .html(d => `|${d}&#x27E9`)
-            .attr('transform', (d, i) => `translate(${i * block_width / 2 + cell_width_unit / 2.5},${25})`)
-            .style('font-size', '1.4em')
+            .attr('transform', (d, i) => `translate(${i * block_width / 2 + cell_width_unit / 2.5},${18})`)
+            .style('font-size', '1em')
             .style('font-weight', 'bold')
             // .style('font-style', 'italic')
             .style('fill', '#000000')
@@ -1473,11 +1484,10 @@ function View(props) {
                 return `translate(${cell_width_unit / 4 + i*45}, ${cell_height_digit / 1.4})`
 
             })
-            .style('font-size', '1.4em')
+            .style('font-size', '1em')
             .style('font-weight', 'bold')
             // .style('font-style', 'italic')
             .style('fill', d=>d['negative']?color_digit_negative:color_digit_positive)
-
 
 
 
@@ -1583,6 +1593,85 @@ function View(props) {
                 .attr('stroke-width', 3)
 
 
+        }
+
+
+        // x gate 的 operation 线
+        if(element['post_gate']== 's'){
+
+            row_g
+                //     .each(d=>{
+                //     console.log(d)
+                // })
+                .filter(d => d['operation'] == '')
+                .append('line')
+                .attr('x1', cell_width_unit / 2)
+                .attr('y1', cell_height_digit + 10)
+                .attr('x2', cell_width_unit / 2)
+                .attr('y2', cell_height_digit + cell_height_operation-10)
+                .style('stroke', color_null)
+                .style('stroke-width', 3)
+                .attr('stroke-dasharray', 5)
+                .attr("marker-end", `url(#${get_marker(color_null)})`)
+
+
+            // s0, s1是SWAP gate互换的两个qubit
+            let s0, s1
+            row_g.each((d,i)=>{
+                    if(d['operation']=='s0'){
+                        s0 = i
+                    }else if(d['operation']=='s1'){
+                        s1 = i
+                    }
+                })
+
+
+
+            // 画互换的第一条线
+            block_g.append('path')
+                .attr("d", function(d, i){
+
+                    let control = element['control']
+                    let target = element['act_on']
+
+                    let x0 = view3_padding + cell_width_unit/2 + cell_width_unit*s0
+                    let y0 = view3_padding + cell_height_digit
+                    let x1 = view3_padding + cell_width_unit/2 + cell_width_unit*s1
+                    let y1 = view3_padding + cell_height_digit + cell_height_operation
+
+
+                    return "M" + x0 + "," + (y0+10)
+                        + "C" + x0 + "," + (y0 + 50)
+                        + " " + x1 + "," + (y1 - 50)
+                        + " " + x1 + "," + (y1-5)
+                })
+                .attr('fill', 'none')
+                .attr('stroke', color_s)
+                .attr('stroke-width', 3)
+                .attr("marker-end", `url(#${get_marker(color_s)})`)
+
+            // 画互换的第二条线
+            block_g.append('path')
+                .attr("d", function(d, i){
+
+                    let control = element['control']
+                    let target = element['act_on']
+
+                    let x0 = view3_padding + cell_width_unit/2 + cell_width_unit*s1
+                    let y0 = view3_padding + cell_height_digit
+                    let x1 = view3_padding + cell_width_unit/2 + cell_width_unit*s0
+                    let y1 = view3_padding + cell_height_digit + cell_height_operation
+
+
+                    return "M" + x0 + "," + (y0+10)
+                        + "C" + x0 + "," + (y0 + 50)
+                        + " " + x1 + "," + (y1 - 50)
+                        + " " + x1 + "," + (y1-5)
+                })
+                .attr('fill', 'none')
+                .attr('stroke', color_s)
+                .attr('stroke-width', 3)
+                .attr("marker-end", `url(#${get_marker(color_s)})`)
         }
 
 
@@ -1853,7 +1942,7 @@ function View(props) {
         //画图函数
         function render_view(data) {
 
-            const svg_width = 1600, svg_height = 1100
+            const svg_width = 1600, svg_height = 800
 
 
             // 绘制 画布

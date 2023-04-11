@@ -1,5 +1,6 @@
 import * as d3 from 'd3'
-import {state_color_fill, state_color_border, state_color_point} from "./color_scheme";
+import {colorMap_circle_fill, colorMap_circle_border, colorMap_point} from "./view1_colorScheme";
+import {state_dark, state_light, state_Light} from "./color_scheme";
 
 
 function dandelion_chart(state_vectors_, states, bundle_g_, size_arr_, position_arr_, theta_){
@@ -21,7 +22,7 @@ function dandelion_chart(state_vectors_, states, bundle_g_, size_arr_, position_
 
 
     // 判断 size_arr_, position_arr_ 是否合法
-    if(typeof state_vectors_ !== 'object' || state_vectors_.length !== 4){
+    if(typeof state_vectors_ !== 'object'){
         console.log('Dandelion chart parameter `states` not valid')
 
         return
@@ -209,9 +210,9 @@ function dandelion_chart(state_vectors_, states, bundle_g_, size_arr_, position_
         .attr("r", d=>Math.sqrt(Math.pow(-scale_new_x_pow(d['state_vector'][0]) * theta, 2) + Math.pow(-scale_new_y_pow(d['state_vector'][1]) * theta, 2)))
         .attr("cx", d=>-scale_new_x_pow(d['state_vector'][0]) * theta)
         .attr("cy", d=>-scale_new_y_pow(d['state_vector'][1]) * theta)
-        .style("stroke", (d,i)=>state_color_point[d['name']])
+        .style("stroke", (d,i)=>state_dark[d['name']])
         .style("stroke-width", 1)
-        .style("fill", (d,i)=>state_color_fill[d['name']])
+        .style("fill", (d,i)=>state_Light[d['name']])
         .style('opacity', opacity)
 
 
@@ -322,7 +323,7 @@ function dandelion_chart(state_vectors_, states, bundle_g_, size_arr_, position_
         .attr("cy", 0)
         // .style("stroke", "#7a0099")
         // .style("stroke-width", 1)
-        .style("fill", (d,i)=>state_color_point[d['name']])
+        .style("fill", (d,i)=>state_dark[d['name']])
 
 
 
